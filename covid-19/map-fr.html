@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<!--[if lt IE 9]><html class="no-js lt-ie9" lang="en" dir="ltr"><![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="fr" dir="ltr">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="/src/css/theme.min.css">
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+
+    <style>
+        .svg-container {
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            vertical-align: top;
+            overflow: hidden;
+        }
+
+        .svg-content-responsive {
+            display: inline-block;
+            position: absolute;
+            top: 10px;
+            left: 0;
+        }
+
+        #searchResult .thumbnail img {
+            height: 150px;
+            width: auto;
+        }
+
+        .thumbnail {
+            background-color: #fff;
+        }
+
+        #live-search {
+            margin: 10px;
+        }
+
+        #filter {
+            padding-left: 5px;
+            padding-right: 20px;
+        }
+
+        #searchResult {
+            display: none;
+        }
+
+        .clearable {}
+
+        .close-icon {
+            border: 1px solid transparent;
+            background-color: transparent;
+            display: inline-block;
+            vertical-align: middle;
+            outline: 0;
+            cursor: pointer;
+        }
+
+        .close-icon:after {
+            content: "X";
+            width: 15px;
+            height: 15px;
+            background-color: #888;
+            z-index: 1;
+            margin: auto;
+            padding: 4px;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 0 2px #888;
+            cursor: pointer;
+        }
+
+        #filter:not(:valid)~.close-icon {
+            display: none;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+
+        svg {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
+        .parent:focus,
+        .parent rect:focus,
+        .parent rect:hover {
+            stroke: black!important;
+            stroke-width: 2px!important;
+        }
+
+        .legend rect:focus,
+        .legend rect:hover {
+            stroke: black;
+            stroke-width: 4px;
+        }
+
+        .legend rect.inactive {
+            stroke: none;
+            stroke-width: 0px;
+        }
+
+        #toolTip {
+            top: 0;
+            left: 0;
+            font-size: 12px;
+            white-space: nowrap;
+            font-weight: normal;
+            z-index: 200;
+            position: absolute;
+            display: none;
+            border-radius: 10px;
+            background-color: #000;
+            opacity: 0.9;
+            color: #fff;
+            padding: 5px 10px;
+            pointer-events: none;
+        }
+
+        figcaption {
+            background: #fff;
+            font-size: .9em;
+            padding-left: 5px;
+            color: #fff;
+            background-color: #333;
+        }
+
+        #ICD10sexIcon,
+        #ICD10yearIcon {
+            display: none;
+            position: absolute;
+            top: 48px;
+            left: 23px;
+        }
+
+        .descriptionText {
+            border-color: #f90;
+            border-radius: 0;
+            border-style: solid;
+            border-width: 0 0 0 10px;
+            padding-left: 15px;
+        }
+
+        #description,
+        #description2 {
+            height: 180px;
+            display: inline-block;
+            padding-left: 40px;
+        }
+
+        @media only screen and (max-width: 991px) {
+            #mainImg {
+                margin-bottom: 20px;
+            }
+            #textarea {
+                margin-top: 20px;
+            }
+        }
+
+        @media only screen and (max-width: 525px) {
+            .btn-success,
+            .btn-info {
+                margin: 5px 0px!important;
+                width: 100%!important;
+            }
+            #description,
+            #description2 {
+                padding-left: 10px;
+            }
+            #description .col-sm-12,
+            #description2 .col-sm-12 {
+                padding-left: 0px;
+            }
+            #description h4,
+            #description2 h4 {
+                display: none;
+                margin-top: 5px;
+            }
+        }
+
+        @media only screen and (min-width: 991px) {
+            .pathText {
+                display: none;
+            }
+            #textarea {
+                margin-top: 128px;
+            }
+        }
+
+        @media only screen and (max-width: 991px) {
+            .names {
+                display: none;
+            }
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .x.axis path {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 3px;
+        }
+
+        .country:hover {
+            opacity: 1!important;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: white;
+            stroke-width: 6;
+        }
+
+        #Zero path {
+            stroke: black!important;
+            stroke-width: 1px;
+        }
+
+        #Zero text {
+            display: none;
+        }
+
+        .dashed {
+            stroke-dasharray: 10, 5;
+        }
+
+        .col-md-3 select {
+            width: 100%;
+        }
+
+        .mortality .pattern {
+            display: none;
+        }
+
+        .dataTables_info:after {
+            display: none;
+        }
+
+        .selectionLabel {
+            margin-left: 5px;
+            margin-right: 5px;
+            font-weight: normal;
+        }
+
+        #dropdownsInc ul {
+            list-style: none;
+        }
+
+        .cTable {
+            margin-bottom: 13px;
+        }
+
+        .cTable table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .cTable th,
+        .cTable td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        .cTable tr:nth-child(even) {
+            background-color: #f2f2f2
+        }
+
+        .cTable th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        #dataTable tbody tr td:first-child {
+            text-align: left;
+            font-weight: bold;
+        }
+    </style>
+    <link rel="stylesheet" href="/src/css/font-awesome.css" />
+    <script>
+        function clearSearch() {
+            $('#filter').val("");
+        }
+    </script>
+</head>
+
+<body vocab="http://schema.org/" typeof="WebPage" style="background-color: white; width:95%;">
+    <div id ="covid19MapContent">
+        <h3 style="margin-top: 11px;">
+            <label for="dropdownType3" class="wb-inv">Types de statistiques</label>
+            <select id="dropdownType3" class="form-control dropdown form-inline" style="display:inline; font-size:1.1em; color:#333; height:39px;">
+			  	<optgroup label="Types de statistiques">
+			    	<option selected value="num" class="toggleBtns">Nombre</option>
+			    	<option value="rate" class="toggleBtns">Taux</option>
+			  	</optgroup>
+			</select>			
+            <span class="numArticle2">de</span><label for="dropdownType1" class="wb-inv">Types de mesures</label>
+			<select id="dropdownType1" class="form-control dropdown form-inline" style="display:inline; font-size:1.1em; color:#333; height:39px;">
+				<optgroup label="Types de mesures">
+					<option value="tests" class="toggleBtns">tests effectués</option>
+					<option value="active" class="toggleBtns">cas actifs</option>
+					<option selected value="total" class="toggleBtns">cas totaux</option>
+					<option value="deaths" class="toggleBtns">décès</option>
+					<option value="recover" class="toggleBtns">personnes rétablies</option>
+				</optgroup>
+			</select> 
+			<span class="numArticle">de</span> COVID-19 au Canada en date du <span class="txtCurrentDate"></span>
+		</h3>
+        <small>Dernière mise à jour des données <time id="updateTime"></time> HNE</small>
+        <p id="mapInstruct" style="margin-top:10px;"><i class="fa fa-info-circle" aria-hidden="true"></i> Survolez les provinces et les territoires pour voir le nombre total de cas, cas actifs, de personnes rétablies, de tests effectués ou de décès au Canada. Cliquez sur le bouton « Jouer » pour animer la carte.</p>
+        
+        <div id="map-container" class="row" >
+            <div id="map" class="col-md-9"></div>
+            <div class="col-md-3">  
+                <p id="textarea" style="font-size:17px;">Le <span class="txtTypeMod">nombre</span> <span class="numArticle2">de </span><span class="txtType">cas totaux</span> <span class="numArticle">de</span> <span class="nowrap">COVID-19</span> <span id="textArticle1">au</span> <strong><span id="txtName">Canada</span></strong> était de <strong><span style="white-space:nowrap" id="txtTotal"></span> <span style="display:none;white-space:nowrap;" id="txtTotalMod">par 100 000 personnes</span></strong> en date du <span id="descText2"></span>.</p>
+                <hr/>
+                <svg id="trendData" width="100%" preserveAspectRatio="xMinYMin meet" viewBox="0 0 292 230">
+                </svg>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+						<button id="animateMap" style="width:90px;" class="btn btn-info off"><i class="fa fa-play" aria-hidden="true"></i> Jouer</button>
+						<a class="btn btn-info" href="https://sante-infobase.canada.ca/src/data/covidLive/covid19-download.csv"><i class="fa fa-download" aria-hidden="true"></i> <span class="wb-invisible">Télécharger les données au format </span>.csv</a>
+                    </div>
+                </div>
+                <hr/>
+            </div>
+        </div>
+    </div>
+    <p>Ces renseignements ont été tirés des données de nos partenaires provinciaux et territoriaux. Ils sont à jour en date du <span class="updateTime"></span>. Pour obtenir les données les plus récentes concernant une province, un territoire ou une ville, veuillez consulter leur site web respectif.</p>
+    <script src="/src/js/polylabel.js"></script>
+	<script src="https://unpkg.com/textures@1.2.0/dist/textures.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-interpolate-path@2.0.0/build/d3-interpolate-path.min.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script src="/src/js/provincesiframe.js"></script>
+</body>
+
+</html>

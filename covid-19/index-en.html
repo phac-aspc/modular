@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<!--[if lt IE 9]><html class="no-js lt-ie9" lang="en" dir="ltr"><![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en" dir="ltr">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!-- Web Experience Toolkit (WET) / Boîte à outils de l'expérience Web (BOEW)
+		wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html -->
+    <title>Interactive Data Visualization of COVID-19 in Canada - Public Health Infobase | Public Health Agency of Canada</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <!-- Meta data -->
+    <meta name="description" content="COVID-19 is a serious health threat, and the situation is evolving daily. The risk will vary between and within communities, but given the increasing number of cases in Canada, the risk to Canadians is considered high. This does not mean that all Canadians will get the disease. It means that there is already a significant impact on our health care system. If we do not flatten the epidemic curve now, the increase of COVID-19 cases could impact health care resources available to Canadians.">
+    <!-- Meta data-->
+    <!--[if gte IE 9 | !IE ]><!-->
+    <link href="/src/assets/favicon.ico" rel="icon" type="image/x-icon">
+    <link rel="stylesheet" href="/src/css/wet-boew.min.css">
+    <!--<![endif]-->
+    <link rel="stylesheet" href="/src/css/theme.min.css">
+    <!--[if lt IE 9]>
+		<link href="/src/assets/favicon.ico" rel="shortcut icon" />
+		
+		<link rel="stylesheet" href="/src/css/ie8-wet-boew.min.css" />
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="/src/js/ie8-wet-boew.min.js"></script>
+		<![endif]-->
+    <!--[if lte IE 9]>
+		
+		
+		<![endif]-->
+    <noscript>
+		<link rel="stylesheet" href="/src/css/noscript.min.css" />
+	</noscript>
+
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+
+    <style>
+        .svg-container {
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            /* aspect ratio */
+            vertical-align: top;
+            overflow: hidden;
+        }
+
+        .svg-content-responsive {
+            display: inline-block;
+            position: absolute;
+            top: 10px;
+            left: 0;
+        }
+
+        #searchResult .thumbnail img {
+            height: 150px;
+            width: auto;
+        }
+
+        .thumbnail {
+            background-color: #fff;
+        }
+
+        #live-search {
+            margin: 10px;
+        }
+
+        #filter {
+            padding-left: 5px;
+            padding-right: 20px;
+        }
+
+        #searchResult {
+            display: none;
+        }
+
+        .clearable {}
+
+        .close-icon {
+            border: 1px solid transparent;
+            background-color: transparent;
+            display: inline-block;
+            vertical-align: middle;
+            outline: 0;
+            cursor: pointer;
+        }
+
+        .close-icon:after {
+            content: "X";
+            width: 15px;
+            height: 15px;
+            background-color: #888;
+            z-index: 1;
+            margin: auto;
+            padding: 4px;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 0 2px #888;
+            cursor: pointer;
+        }
+
+        #filter:not(:valid)~.close-icon {
+            display: none;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+
+        svg {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
+        .parent:focus,
+        .parent rect:focus,
+        .parent rect:hover {
+            stroke: black!important;
+            stroke-width: 2px!important;
+        }
+
+        .legend rect:focus,
+        .legend rect:hover {
+            stroke: black;
+            stroke-width: 4px;
+        }
+
+        .legend rect.inactive {
+            stroke: none;
+            stroke-width: 0px;
+        }
+
+        #toolTip {
+            top: 0;
+            left: 0;
+            font-size: 12px;
+            white-space: nowrap;
+            font-weight: normal;
+            z-index: 200;
+            position: absolute;
+            display: none;
+            border-radius: 10px;
+            background-color: #000;
+            opacity: 0.9;
+            color: #fff;
+            padding: 5px 10px;
+            pointer-events: none;
+        }
+
+        figcaption {
+            background: #fff;
+            font-size: .9em;
+            padding-left: 5px;
+            color: #fff;
+            background-color: #333;
+        }
+
+        #ICD10sexIcon,
+        #ICD10yearIcon {
+            display: none;
+            position: absolute;
+            top: 48px;
+            left: 23px;
+        }
+
+        .descriptionText {
+            border-color: #f90;
+            border-radius: 0;
+            border-style: solid;
+            border-width: 0 0 0 10px;
+            padding-left: 15px;
+        }
+
+        #description,
+        #description2 {
+            height: 180px;
+            display: inline-block;
+            padding-left: 40px;
+        }
+
+        @media only screen and (max-width: 991px) {
+            #mainImg {
+                margin-bottom: 20px;
+            }
+            #textarea {
+                margin-top: 20px;
+            }
+        }
+
+        @media only screen and (max-width: 525px) {
+            .btn-success,
+            .btn-info {
+                margin: 5px 0px!important;
+                width: 100%!important;
+            }
+            #description,
+            #description2 {
+                padding-left: 10px;
+            }
+            #description .col-sm-12,
+            #description2 .col-sm-12 {
+                padding-left: 0px;
+            }
+            #description h4,
+            #description2 h4 {
+                display: none;
+                margin-top: 5px;
+            }
+        }
+
+        @media only screen and (min-width: 991px) {
+            .pathText {
+                display: none;
+            }
+            #textarea {
+                margin-top: 128px;
+            }
+        }
+
+        @media only screen and (max-width: 991px) {
+            .names {
+                display: none;
+            }
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .x.axis path {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 3px;
+        }
+
+        .country:hover {
+            opacity: 1!important;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: white;
+            stroke-width: 6;
+        }
+
+        #Zero path {
+            stroke: black!important;
+            stroke-width: 1px;
+        }
+
+        #Zero text {
+            display: none;
+        }
+
+        .dashed {
+            stroke-dasharray: 10, 5;
+        }
+
+        .col-md-3 select {
+            width: 100%;
+        }
+
+        .mortality .pattern {
+            display: none;
+        }
+
+        .dataTables_info:after {
+            display: none;
+        }
+
+        .selectionLabel {
+            margin-left: 5px;
+            margin-right: 5px;
+            font-weight: normal;
+        }
+
+        #dropdownsInc ul {
+            list-style: none;
+        }
+
+        .cTable {
+            margin-bottom: 13px;
+        }
+
+        .cTable table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .cTable th,
+        .cTable td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        .cTable tr:nth-child(even) {
+            background-color: #f2f2f2
+        }
+
+        .cTable th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .tdTable {
+            text-align: right;
+        }
+        
+        #dataTable tbody tr td:first-child {
+            text-align: left;
+            /*font-weight: bold;*/
+        }
+        #dataTable thead tr th {
+            width:190px;
+        }        
+        #dataTable thead tr th:first-child {
+            width:auto;
+        }
+
+        /*.axis text {*/
+
+        /*    font-size:20px;*/
+
+        /*}*/
+
+        /*#y-axis-title, #x-axis-title {*/
+
+        /*    font-size:24px!important;*/
+
+        /*}*/
+    </style>
+    <link rel="stylesheet" href="/src/css/font-awesome.css" />
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
+    <script>
+        function clearSearch() {
+            $('#filter').val("");
+        }
+    </script>
+</head>
+
+<body vocab="http://schema.org/" typeof="WebPage">
+    <!-- Google Tag Manager DO NOT REMOVE OR MODIFY - NE PAS SUPPRIMER OU MODIFIER -->
+    <script>dataLayer1 = [];</script>
+	<script>dataLayer = [];</script>
+<!-- End Google Tag Manager -->
+	<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-TN3RPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TN3RPZ');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager DO NOT REMOVE OR MODIFY - NE PAS SUPPRIMER OU MODIFIER -->
+<noscript><iframe title="Google Tag Manager" src="//www.googletagmanager.com/ns.html?id=GTM-TLGQ9K" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer1'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer1','GTM-TLGQ9K');</script>
+<!-- End Google Tag Manager -->
+    <ul id="wb-tphp">
+        <li class="wb-slc">
+            <a class="wb-sl" href="#wb-cont">Skip to main content</a>
+        </li>
+        <li class="wb-slc visible-sm visible-md visible-lg">
+            <a class="wb-sl" href="#wb-info">Skip to "About this site"</a>
+        </li>
+    </ul>
+    <header role="banner">
+        <div id="wb-bnr" class="container">
+            <section id="wb-lng" class="visible-md visible-lg text-right">
+                <h2 class="wb-inv">Language selection</h2>
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="list-inline margin-bottom-none">
+                            <li><a lang="fr" href="https://sante-infobase.canada.ca/covid-19/">Français</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <div class="row">
+                <div class="brand col-xs-8 col-sm-9 col-md-6">
+                    <a href="http://www.canada.ca/en/index.html"><object type="image/svg+xml" tabindex="-1" data="/src/assets/sig-blk-en.svg"></object><span class="wb-inv"> Government of Canada</span></a>
+                </div>
+                <section class="wb-mb-links col-xs-4 col-sm-3 visible-sm visible-xs" id="wb-glb-mn">
+                    <h2>Search and menus</h2>
+                    <ul class="list-inline text-right chvrn">
+                        <li><a href="#mb-pnl" title="Search and menus" aria-controls="mb-pnl" class="overlay-lnk" role="button"><span class="glyphicon glyphicon-search"><span class="glyphicon glyphicon-th-list"><span class="wb-inv">Search and menus</span></span></span></a></li>
+                    </ul>
+                    <div id="mb-pnl"></div>
+                </section>
+                <section id="wb-srch" class="col-xs-6 text-right visible-md visible-lg">
+                    <h2 class="wb-inv">Search</h2>
+                    <form action="#" method="post" name="cse-search-box" role="search" class="form-inline">
+                        <div class="form-group">
+                            <label for="wb-srch-q" class="wb-inv">Search website</label>
+                            <input id="wb-srch-q" list="wb-srch-q-ac" class="wb-srch-q form-control" name="q" type="search" value="" size="27" maxlength="150" placeholder="Search Canada.ca">
+                            <datalist id="wb-srch-q-ac">
+							<!--[if lte IE 9]><select><![endif]-->
+							<!--[if lte IE 9]></select><![endif]-->
+						</datalist>
+                        </div>
+                        <div class="form-group submit">
+                            <button type="submit" id="wb-srch-sub" class="btn btn-primary btn-small" name="wb-srch-sub"><span class="glyphicon-search glyphicon"></span><span class="wb-inv">Search</span></button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+        <nav role="navigation" id="wb-sm" class="wb-menu visible-md visible-lg" data-trgt="mb-pnl" data-ajax-fetch="/src/ajax/sitemenu-en.html" typeof="SiteNavigationElement">
+            <h2 class="wb-inv">Topics menu</h2>
+            <div class="container nvbar">
+                <div class="row">
+                    <ul class="list-inline menu">
+                        <li><a href="http://www.esdc.gc.ca/en/jobs/index.page">Jobs</a></li>
+                        <li><a href="http://www.cic.gc.ca/english/index.asp">Immigration</a></li>
+                        <li><a href="http://travel.gc.ca">Travel</a></li>
+                        <li><a href="http://www.canada.ca/en/services/business/index.html">Business</a></li>
+                        <li><a href="http://www.canada.ca/en/services/benefits/index.html">Benefits</a></li>
+                        <li><a href="http://healthycanadians.gc.ca/index-eng.php">Health</a></li>
+                        <li><a href="http://www.canada.ca/en/services/taxes/index.html">Taxes</a></li>
+                        <li><a href="http://www.canada.ca/en/services/index.html">More services</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <nav role="navigation" id="wb-bc" class="" property="breadcrumb">
+            <h2 class="wb-inv">You are here:</h2>
+            <div class="container">
+                <div class="row">
+                    <ol class="breadcrumb">
+                        <li><a href="https://www.canada.ca/en.html">Home</a></li>
+                        <li><a href="https://www.canada.ca/en/services/health.html">Health</a></li>
+                        <li><a href="https://www.canada.ca/en/services/health/science-research-data.html">Science, research & data</a></li>
+                        <li><a href="https://health-infobase.canada.ca/">Public Health Infobase</a></li>
+                        <li>COVID-19 in Canada</li>
+                    </ol>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main role="main" property="mainContentOfPage" class="container">
+            <h1 id="wb-cont" property="name">Interactive data visualizations of COVID-19</h1>
+			<div class="col-md-12" style="padding:0px">
+		<div class="btn-group btn-group-lg btn-group-justified" style="padding:20px 0px;">
+			<a class="active btn btn-primary" role="button" href="https://health-infobase.canada.ca/covid-19/">Canada</a>
+			<a class="btn btn-default" role="button" href="https://health-infobase.canada.ca/covid-19/international/">International</a>
+			<a class="btn btn-default" role="button" href="https://health-infobase.canada.ca/covid-19/visual-data-gallery/">Visual data gallery</a>
+		</div>
+		</div>
+		<p>Interactive data map of COVID-19 cases across Canada. Shows number of cases, tests and deaths over time.</p>
+			<div class="clearfix"></div>			
+			<h2>
+				<label for="dropdownType3" class="wb-inv">Types of statistics</label>
+				<select id="dropdownType3" class="form-control dropdown form-inline" style="display:inline; font-size:1.1em; color:#333; height:39px; padding:3px 9px;">
+					<optgroup label="Types of statistics">
+						<option selected value="num" class="toggleBtns">Count</option>
+						<option value="rate" class="toggleBtns">Rate</option>
+					</optgroup>
+				</select>
+				<span class="titleNumMod">of</span>
+				<label for="dropdownType1" class="wb-inv">Types of measures</label>
+				<select id="dropdownType1" class="form-control dropdown form-inline" style="display:inline; font-size:26px; color:#333; height:39px;">
+					<optgroup label="Types of measures">
+						<option value="tested" class="toggleBtns">tests performed</option>
+						<option value="active" class="toggleBtns">active cases</option>
+						<option value="total" class="toggleBtns">total cases</option>
+						<option value="deaths" class="toggleBtns">deaths</option>
+						<option value="recover" class="toggleBtns">cases recovered</option>
+						<option selected value="total_last7" class="toggleBtns">cases (last 7 days)</option>	
+						<option value="total_last14" class="toggleBtns">cases (last 14 days)</option>	
+						<option value="deaths_last7" class="toggleBtns">deaths (last 7 days)</option>	
+						<option value="deaths_last14" class="toggleBtns">deaths (last 14 days)</option>	
+					</optgroup>
+				</select>
+			    <span class="numArticle">of</span> COVID-19 in Canada as of <span class="txtCurrentDate"></span>
+			</h2>
+          <small>Last data update <time class="updateTime"></time></small>  
+        <p id="mapInstruct" style="margin-top:10px;"><i class="fa fa-info-circle" aria-hidden="true"></i> Hover over provinces and territories to see total cases, recovered cases, tests performed or deaths in Canada over time. Click the play button to animate the map.</p>
+        
+        <div id="map-container" class="row" >
+            <div id="map" class="col-md-9"></div>
+            <div class="col-md-3">
+                <p id="textarea" style="font-size:17px;">The number of <span class="txtType">total cases</span> <span class="numArticle">of</span> <span class="nowrap">COVID-19</span> <span id="textArticle1">in</span> <strong><span id="txtName">Canada</span></strong> was <strong><span id="txtTotal">1,471</span> <span style="display:none;" id="txtTotalMod">per 100,000 population</span></strong> as of <span id="descText2"></span>.</p>
+                <hr/>
+                <svg id="trendData" width="100%" preserveAspectRatio="xMinYMin meet" viewBox="0 0 292 230">
+                </svg>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                    <button id="animateMap" style="width:89.53px;" class="btn btn-info off"><i class="fa fa-play" aria-hidden="true"></i> Play</button>
+                    <a class="btn btn-info" href="https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"><i class="fa fa-download" aria-hidden="true"></i> <span class="wb-invisible">Download data in </span>.csv<span class="wb-invisible"> format</span></a>
+                    <!--<button id="downloadImage" class="btn btn-info disabled"><i class="fa fa-save" aria-hidden="true"></i> .png</button>-->
+                    </div>
+                </div>
+                <hr/>
+            </div>
+        </div>
+        <p>Starting February 1, 2021, laboratory test indicators are based on the number of laboratory tests performed and the percentage of tests positive. These data replace previous metrics based on unique individuals tested and provide a more accurate measure of test positivity and promote greater standardization in reporting across Canada. The proportion of tests positive is expected to decrease compared with previous person-based methods, as all tests will be included in the calculation, including new tests on the same person over time.</p>
+		<div class="table-responsive">
+			<table id="dataTable" class="table table-striped table-bordered table-hover">
+			  <caption class="text-left">
+			  Areas in Canada with cases of COVID-19 as of <span class="txtCurrentDate"></span>
+			  </caption>
+			  <thead>                  
+                    <tr class="bg-primary">
+                        <th scope="col" rowspan="2">Location</th>
+                        <th colspan="2">Total cases</th>
+                        <th colspan="2">Cases last 7 days</th>		
+						<th colspan="2">Active cases</th>						
+                        <th colspan="1">Recovered<sup>††</sup></th>
+                        <th colspan="2">Deaths</th>
+                        <th colspan="2">Deaths last 7 days</th>		
+                        <th colspan="2">Tests performed</th>
+                    </tr>
+                    <tr class="bg-primary">
+                        <th scope="col">Count</th>
+                        <th scope="col">Rate<sup>*</sup></th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Rate<sup>*</sup></th>
+						<th scope="col">Count</th>
+                        <th scope="col">Rate<sup>*</sup></th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Rate<sup>*</sup></th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Rate<sup>*</sup></th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Rate<sup>†</sup></th>
+                    </tr>
+			  </thead>
+			  <tbody>
+			  </tbody>
+			</table>
+            <div id="dataTableNotes">
+    			<!-- <p><sup>***</sup> On July 12, a presumptive positive case from Nunavut was determined to be negative.</p> -->
+    			<p><sup>**</sup> No data is available for this day, and so the most recently available data is displayed.</p>
+    			<p><sup>*</sup> Rate per 100,000 population</p>
+    			<p><sup>†</sup> Rate per 1,000,000 population</p>
+    			<p><sup>††</sup> Recovered refers to cases that are resolved. These are people who have molecular test proof to show they had a positive COVID-19 test taken between 14 to 90 days before travel.</p>
+			</div>
+		</div>
+        
+        <h2> 
+			<label for="dropdownType5" class="wb-inv">Types of statistics</label>
+			<select id="dropdownType5" class="form-control dropdown form-inline" style="display:inline; font-size:1.1em; color:#333; height:45px; padding:3px 9px;">
+				<optgroup label="Types of statistics">
+					<option value="num" class="toggleBtns">Count</option>
+					<option value="rate" class="toggleBtns">Rate</option>
+					<option selected value="avg" class="toggleBtns">Moving average</option>
+				</optgroup>
+			</select>
+			<span class="titleNumMod">of</span>
+			<label for="dropdownType6" class="wb-inv">Types of measures</label>
+			<select id="dropdownType6" class="form-control dropdown form-inline" style="display:inline; font-size:26px; color:#333; height:45px; padding:3px 9px;">
+				<optgroup label="Types of measures">
+					<option value="tests" disabled style="display:none;" class="toggleBtns">tests performed</option>
+					<option value="active" disabled style="display:none;" class="toggleBtns">active cases</option>
+					<option value="total" disabled style="display:none;" class="toggleBtns">total cases</option>
+					<option value="deaths" disabled style="display:none;" class="toggleBtns">deaths</option>
+					<!-- <option value="recover" class="toggleBtns">cases recovered</option> -->
+					<option selected value="total_last7" class="toggleBtns">cases (last 7 days)</option>		
+					<option value="total_last14" disabled style="display:none;" class="toggleBtns">cases (last 14 days)</option>	
+					<option value="deaths_last7" class="toggleBtns">deaths (last 7 days)</option>
+					<option value="deaths_last14" disabled style="display:none;" class="toggleBtns">deaths (last 14 days)</option>	
+				</optgroup>
+			</select>
+			<span class="numArticle2">of</span> COVID-19 in Canada as of <span class="updateTime"></span>
+		</h2>
+		<p><i class="fa fa-info-circle" aria-hidden="true"></i> The figures displayed below demonstrate the progression of cases over time. The range of dates (January 31st, 2020 - present date) is identical for each figure to compare the provinces and territories on the same timescale. The timescale for each figure is created using the total number of cases in Canada.</p>	
+        <button id="logSwitch" class="btn btn-info">Log scale</button>
+        <button id="relativeSwitch" class="btn btn-success">Relative scale</button>
+        <div id="smallMultiple" style="display:flex;flex-wrap: wrap;"></div>
+            
+        <div class="clearfix"></div>
+	</main>
+
+    <footer role="contentinfo" id="wb-info" data-ajax-prepend="/src/ajax/sitefooter-en.html">
+    </footer>
+     <!--[if gte IE 9 | !IE ]><!-->
+    <script src="/src/js/wet-boew.min.js"></script>
+    <!--<![endif]-->
+    <!--[if lt IE 9]>
+		<script src="/src/js/ie8-wet-boew2.min.js"></script>
+		<![endif]-->
+	<script src="/src/js/polylabel.js"></script>
+	<script src="https://unpkg.com/textures@1.2.0/dist/textures.js"></script>
+    <script src="/src/js/theme.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-interpolate-path@2.0.0/build/d3-interpolate-path.min.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script src="/src/js/provincesTEST.js"></script>
+    <!--<script src="/src/js/provinces.js"></script>-->
+    <script type="text/javascript">
+        var dateURL = '/src/data/covidLive/covid19-updateTime.csv';
+        d3.csv(dateURL, function(error, data) {
+            if (error) throw error;
+            var formatTime = d3.timeFormat("%B %-d, %Y, %-I %p EDT");
+            var parseTime = d3.timeParse("%Y-%m-%d %H:%M");
+            $(".updateTime").text(formatTime(parseTime(data["columns"][0])).replace("PM", "pm").replace("AM", "am"));
+        })
+    </script>
+</body>
+
+</html>

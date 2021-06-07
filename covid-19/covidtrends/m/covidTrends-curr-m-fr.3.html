@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<!--[if lt IE 9]><html class="no-js lt-ie9" lang="en" dir="ltr"><![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="fr" dir="ltr">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!-- Web Experience Toolkit (WET) / Boîte à outils de l'expérience Web (BOEW)
+		wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html -->
+    <title>TendancesCOVID - Infobase santé publique | Agence de la santé publique du Canada</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <!-- Meta data -->
+    <meta name="description" content="Welcome to the Public Health Infobase, a series of tools to help visualize, analyze, interpret and disseminate health indicator data for chronic disease, injury and child/maternal health. Our hope is that through these tools, health related data will be converted into information and knowledge that will be used to improve the health of Canadians.">
+    <!-- Meta data-->
+    <!--[if gte IE 9 | !IE ]><!-->
+    <link href="/src/GCWeb/assets/favicon.ico" rel="icon" type="image/x-icon">
+    <link rel="stylesheet" href="/src/GCWeb/css/wet-boew.min.css">
+    <!--<![endif]-->
+    <link rel="stylesheet" href="/src/GCWeb/css/theme.min.css">
+    <!--[if lt IE 9]>
+		<link href="assets/favicon.ico" rel="shortcut icon" />
+		
+		<link rel="stylesheet" href="css/ie8-wet-boew.min.css" />
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="js/ie8-wet-boew.min.js"></script>
+		<![endif]-->
+    <!--[if lte IE 9]>
+		
+		
+		<![endif]-->
+    <noscript>
+		<link rel="stylesheet" href="/src/wet-boew/css/noscript.min.css" />
+	</noscript>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=Object.values%2CNumber.parseInt%2CArray.prototype.find%2CArray.prototype.findIndex%2CArray.prototype.includes%2CString.prototype.includes%2Cfetch%2CObject.entries%2CString.prototype.startsWith"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+    <style>
+		body,.panel {
+		background-color:#fbfbfb;
+		}
+        .map {
+            height: 500px;
+            margin: 30px 0;
+        }
+        
+        /*#postalCode{*/
+        /*    width: 9%;*/
+        /*    float: right;*/
+        /*}*/
+        
+        .activeRegion path{
+            stroke: black;
+            stroke-width: 2px;
+        }
+        
+        #map2{
+            border: 1px solid black;
+        }
+        #postalCode::-webkit-calendar-picker-indicator {
+              opacity: 0;
+           }
+           
+       .nopadding {
+           padding: 0 !important;
+           margin: 0 !important;
+        }
+        .tile{
+            margin-top: 7.5px;
+            margin-bottom: 7.5px;
+        }
+        
+        .btn-map {
+            color: white !important;
+        }
+        
+        #leafmap:focus {
+   outline: -webkit-focus-ring-color auto thin !important; 
+   outline: revert !important;
+}        
+.leaflet-container :focus {
+  outline: -webkit-focus-ring-color auto thin !important;
+    /* Longhand properties:
+  outline-color: -webkit-focus-ring-color !important;
+  outline-style: auto !important;
+  outline-width: thin !important;
+  */
+  outline: revert !important;
+}
+
+        @media all and (max-width: 800px) {
+            #postalCode{
+                width: 100%!important;
+                font-size:15px!important;
+            }
+            .bucketParent {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            .bucket {
+                border-bottom: 2px solid #ccc;
+                border-right: none!important;
+                margin-bottom: 10px;
+            }
+            .bucketLink {
+                padding-left: 0px;
+            }
+            .bucketLinkP{
+                margin-top: 20px!important;
+                margin-bottom: 20px!important;
+            }
+            .bucketText{
+                font-size: 17px!important;
+            }
+        }
+        
+        .titleSpace {
+            user-select: none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet">
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
+    <script>
+        function clearSearch() {
+            $('#filter').val("");
+        }
+    </script>
+</head>
+
+<body vocab="http://schema.org/" typeof="WebPage">
+    <!-- Google Tag Manager DO NOT REMOVE OR MODIFY - NE PAS SUPPRIMER OU MODIFIER -->
+            <script>dataLayer1 = [];</script>
+            <script>dataLayer = [];</script>
+        <!-- End Google Tag Manager -->
+            <!-- Google Tag Manager -->
+        <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-TN3RPZ"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-TN3RPZ');</script>
+        <!-- End Google Tag Manager -->
+        <!-- Google Tag Manager DO NOT REMOVE OR MODIFY - NE PAS SUPPRIMER OU MODIFIER -->
+        <noscript><iframe title="Google Tag Manager" src="//www.googletagmanager.com/ns.html?id=GTM-TLGQ9K" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer1'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer1','GTM-TLGQ9K');</script>
+        <!-- End Google Tag Manager -->  
+    
+    <main role="main" property="mainContentOfPage" class="container">
+	       <div class="row">
+            <div class="col-lg-12 col-xs-12">
+                <h1 class="h2" style="margin-top:5px;"><img width="40px" src="/src/img/covidtrends-icon.png"></img> <span aria-hidden='true'>TendancesCOVID</span><span class="wb-inv titleSpace">Tendances Covid</span> <small style="font-size:58%">de l'Agence de la santé publique du Canada</small></h1>                
+            </div>
+			<div class="col-lg-12 col-xs-12">
+			<p><span aria-hidden='true'>TendancesCOVID</span><span class="wb-inv titleSpace">Tendances Covid</span> est un outil qui fournit des données sommaires sur la COVID-19 dans votre région.
+			</div>
+        </div>        
+        
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-xs-12" id="tileSection"></div>
+        </div>
+        
+        <div class="row" id="searchRegion" style="background-color:#d7faff; padding-bottom:15px">
+            <div class="col-md-12" id="controls">
+                <h2 style="margin-top:5px;">ajouter d'autres régions</h2>
+                <span id="postalCodeContainer">
+                    <form>
+                        <p style="margin:5px 0px 15px;display:inline;" class="h3" for="postalCode">Ajoutez votre code postal (3 premiers caractères) ou municipalité</p>
+                        <label for="postalCode" class="wb-inv">Rechercher</label>
+                        <div class="input-group" style="margin-top:10px;">
+                            <input type="text" id="postalCode" name="locationInput" class="form-control" placeholder="e.g. K0A or Cold Lake" list="suggestions"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" id="searchPostal" type="button">Search</button>
+                            </span>
+                        </div>
+                    </form>
+                </span>
+                <datalist id="suggestions">
+                </datalist>
+            </div>
+        </div>
+        <div class="row col-md-12" style="margin-top:15px;">
+            <p>Remarque :</p>
+            <ul>
+                <li>Des nombres peu élevés ne garantissent pas un faible risque d’infection. Continuez d’observer les mesures de santé publique pour vous protéger et protéger les autres.</li>   
+                <li>En raison des différences dans les sources de données et les délais de mise à jour, des divergences mineures dans les données peuvent survenir. Pour obtenir les données les plus récentes d'une province, d'un territoire, d'une ville, ou d'une région sociosanitaire, veuillez consulter leur site web respectif.</li>
+            </ul>
+        </div>
+        <div class="clearfix"></div>
+        <hr/>
+        <div class="row">
+            <div class="col-xs-12">
+                <h2 style="margin-top:15px;">Faites votre part pour lutter contre la pandémie</h2>
+            </div>
+            <div class="col-xs-12" style="text-align:center;"> <!--display:flex remove for mobile-->
+                <div class="icon-container">
+                    <div class="col-xs-6 col-sm-6 col-md-2of10" id="CovidAlert" style="display:inline-block;margin-bottom:5px;">
+                        <a href="https://www.canada.ca/en/public-health/services/diseases/coronavirus-disease-covid-19/covid-alert.html" target="_blank">
+                            <img class="center-block" width="100" height="100" src="/src/img/covidAlert.jpg" alt="">
+                            <p class="h5">Téléchargez Alerte COVID</p>
+                        </a>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-2of10" id="distance" style="display:inline-block;margin-bottom:5px;">
+                        <img class="center-block" width="100px" height="100px" src="/src/img/keep-distance.png" alt="">
+                        <p class="h5">Maintenir une distance physique</p>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-2of10" id="Facemask" style="display:inline-block;margin-bottom:5px;">
+                        <img class="center-block" width="100" height="100" src="/src/img/mask.png" alt="">
+                        <p class="h5">Porter un masque</p>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-2of10" id="handWash" style="display:inline-block;margin-bottom:5px;">
+                        <img class="center-block" width="100" height="100" src="/src/img/handwash.png" alt="">
+                        <p class="h5">Laver les mains</p>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-2of10" id="vaccine" style="display:inline-block;margin-bottom:5px;">
+                        <img class="center-block" width="100" height="100" src="/src/img/syringe.png" alt="">
+                        <p class="h5">Faites-vous vacciner</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="clearfix"></div>
+
+        
+        <div class="row col-md-12">
+            <h2>Que sont les régions sanitaires?</h2>
+            <p>Les régions sanitaires sont des régions géographiques définies par les ministères provinciaux et territoriaux de la Santé. Les autorités sanitaires locales sont responsables de la prestation et de l’administration des services de santé aux Canadiens dans leur région sanitaire.</p>
+            
+            <h2>Données épidémiologiques</h2>
+            <p>Nous utilisons des données de surveillance épidémiologique pour montrer comment la situation de la COVID-19 évolue au Canada. Le tableau de bord est mis à jour quotidiennement à environ 21 h 30, heure de l’Est, lorsque des cas confirmés et décès ont été signalés publiquement. Mise à jour le <time class="updateTime">2020-10-27</time>.</p>
+            <p>Source de données: Berry I, Soucy J-PR, Tuite A, Fisman D. Open access epidemiologic data and an interactive dashboard to monitor the COVID-19 outbreak in Canada. CMAJ. 2020 Apr 14; 192(15) : E420. DOI: <a href="https://doi.org/10.1503/cmaj.75262">Open access epidemiologic data and an interactive dashboard to monitor the COVID-19 outbreak in Canada</a>.</p>
+            
+            <h2 id="VaccinationCoverageDataSection">Données sur la vaccination</h2>
+            <!--<p>Nous suivons le <a href="https://health-infobase.canada.ca/covid-19/vaccination-coverage/">pourcentage de personnes vaccinées à ce jour contre la COVID-19</a> dans différentes populations. Ces informations sont mises à jour tous les vendredis à 12h00, heure de l’Est, avec les données jusqu'à samedi précédent, inclusivement.</p>-->
+            <p>Nous suivons <a href="https://sante-infobase.canada.ca/covid-19/couverture-vaccinale/">la progression de la vaccination contre la COVID-19 au Canada</a> par données démographiques clés et par produit vaccinal. Nous mettons à jour ces informations tous les vendredis à 12h00, heure de l'Est, avec les données jusqu'au samedi précédent, inclusivement.</p>
+            
+            <h2 id="FluWatchersDataSection">Données d’ActionGrippe</h2>
+            <p>Pour la saison de surveillance 2020-2021, le programme <a href="https://www.canada.ca/fr/sante-publique/services/maladies/grippe-influenza/grippe-a-loeil.html" target="_blank">ActionGrippe</a> suit à la fois la COVID-19 et la grippe dans la communauté. En effet, certains des symptômes sont communs aux deux maladies (comme la toux et la fièvre). Pour cette raison, les données présentées sur la carte ne mesurent pas nécessairement le niveau réel de COVID-19 dans une région.</p>
+            <p>Les participants du programme ActionGrippe sont des bénévoles qui surveillent leurs symptômes chaque semaine. <a href="https://rcrsp.canada.ca/fluWatcher/enregistrer" target="_blank">Inscrivez-vous</a> pour participer et contribuer à la précision des données.</p>
+            
+            <h2 id="MobilityDataSection">Données sur la mobilité</h2>
+            <p>Nous utilisons les données sur la mobilité pour comprendre les tendances des déplacements des populations pendant la pandémie de COVID-19.</p>
+            <p>Ce tableau de bord affiche les données sur la mobilité au niveau de la région sanitaire. Ces données sont anonymes et donnent un aperçu des déplacements de la population.</p>
+            <p><strong>Le gouvernement du Canada, les responsables de la santé publique et tous les utilisateurs de ces données ne peuvent pas déterminer les déplacements d’un individu</strong></p>
+            <p>Les données de mobilité sont mises à jour de façon hebdomadaire tous les <span id="mobilityUpdate">jeudis</span> à 10 h HNE.</p>
+            <details>
+                <summary><h3>Mesure de la mobilité</h3></summary>
+                <p>Les données sur la mobilité affichées ici montrent les changements dans les déplacements au cours d’une semaine, comparativement à ceux de la semaine précédente. Un déplacement fait référence au pourcentage de temps passé hors d'une zone primaire. Les zones primaires sont celles où les appareils passent le plus de temps pendant la nuit. Ce changement dans les déplacements nous aide à comprendre les risques associés à la transmission de la COVID-19. Plus une population est mobile, plus grande est la probabilité de transmission du virus.</p>
+                <h3>Limites</h3>
+                <p>Le gouvernement du Canada achète des données sur la mobilité auprès d’entreprises qui se spécialisent dans la production de données anonymisées et agrégées sur la mobilité. Ces données sont fondées sur des services basés sur la localisation qui sont intégrés dans diverses applications de tiers sur des appareils personnels. Le gouvernement du Canada ne reçoit que des chiffres agrégés qui décrivent les déplacements de grandes populations.</p>
+                <p>Il y a des limites à l’utilisation de ces données comme indicateur du risque de transmission de la COVID.</p>
+                <p>Les données <strong>ne peuvent pas :</strong></p>
+                <ul class="fa-ul">
+                    <li><span class="fa fa-li fa-times text-danger"></span>montrer le déplacement effectué par une personne qui n’a pas de GPS ou d’appareil Wi-Fi;</li>
+                    <li><span class="fa fa-li fa-times text-danger"></span>montrer si les mesures de santé publique sont suivies (comme le port d’un masque ou le maintien d’une distance physique de deux mètres);
+                </ul>
+                <p>Les données sur la mobilité <strong>ne tiennent pas</strong> compte des différences suivantes :</p>
+                <ul class="fa-ul">
+                    <li><span class="fa fa-li fa-times text-danger"></span>Politiques locales</li>
+                    <li><span class="fa fa-li fa-times text-danger"></span>Densité de la population</li>
+                    <li><span class="fa fa-li fa-times text-danger"></span>Paysages (p. ex., forêts)</li>
+                    <li><span class="fa fa-li fa-times text-danger"></span>Distance entre les services essentiels et le domicile d’une personne</li>
+                </ul>
+                <p>Les données sur la mobilité dans TendancesCOVID sont fondées sur un échantillon de la population utilisant certains appareils et ne représentent donc pas la population entière. Les données <strong>ne contiennent pas</strong> non plus de données démographiques. Par conséquent, ces données ne tiennent pas compte des différences démographiques suivantes :</p>
+                <ul class="fa-ul">
+                    <li><span class="fa fa-li fa-times text-danger"></span>&#194ge</li>
+                    <li><span class="fa fa-li fa-times text-danger"></span>Sexe</li>
+                    <li><span class="fa fa-li fa-times text-danger"></span>Revenu</li>
+                </ul>
+            </details>
+            
+        </div>
+        <br/>
+        <div class="row col-md-12">
+            <h2>Liens utiles</h2>
+            <ul>
+                <li><a href="https://sante-infobase.canada.ca/covid-19/resume-epidemiologique-cas-covid-19.html" target="_blank">Mise à jour quotidienne sur l’épidémiologie de la COVID-19</a></li>
+                <li><a href="https://sante-infobase.canada.ca/covid-19/international/" target="_blank">Visualisations interactives de données de COVID-19</a></li>
+                <li><a href="https://sante-infobase.canada.ca/covid-19/couverture-vaccinale/" target="_blank">Vaccination contre la COVID-19 au Canada</a></li>
+                <li><a href="https://www.canada.ca/fr/sante-publique/services/maladies/grippe-influenza/grippe-a-loeil.html" target="_blank">Programme ActionGrippe</a></li>
+                <li><a href="https://www.cmaj.ca/content/192/15/E420" target="_blank">Canadian Medical Association Journal: Open access epidemiologic data and an interactive dashboard to monitor the COVID-19 outbreak in Canada</a></li>
+			</ul>
+        </div>
+        
+		<div class="row col-md-12">
+		<h2>Contactez-nous</h2>
+		<p>Questions, commentaires ou suggestions? <a href="mailto:covidtrends@canada.ca">Veuillez nous envoyer un courriel</a>! L’information contenue sur le site ne remplace en aucun cas l’avis d’une ressource professionnelle de la santé. Si vous avez des questions concernant votre santé, consultez une ressource professionnelle.</p>
+		</div>
+        <div class="clearfix"></div>
+        <div class="row pagedetails">
+            <div class="col-sm-6 col-lg-4 mrgn-tp-sm">
+                <a href="https://www.canada.ca/fr/signaler-probleme.html" class="btn btn-default btn-block">Signaler un problème ou une erreur sur cette page</a>
+            </div>
+            <div class="col-sm-3 mrgn-tp-sm pull-right">
+                <div class="wb-share" data-wb-share='{"lnkClass": "btn btn-default btn-block"}'></div>
+            </div>
+            <div class="datemod col-xs-12 mrgn-tp-lg">
+                <dl id="wb-dtmd">
+                    <dt>Date de modification: </dt>
+                    <dd><time class="dateModified" property="dateModified">2020-12-03</time></dd>
+                </dl>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </main>
+
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+
+     <!--[if gte IE 9 | !IE ]><!-->
+    <script src="/src/wet-boew/js/wet-boew.min.js"></script>
+    <!--<![endif]-->
+    <!--[if lt IE 9]>
+		<script src="/src/js/ie8-wet-boew2.min.js"></script>
+		<![endif]-->
+    <script src="/src/GCWeb/js/theme.min.js"></script>
+
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-interpolate-path@2.0.0/build/d3-interpolate-path.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+    <script src="/src/js/covidtrends/covidtrends-mobile.js"></script>
+    <!--<script src="./covidtrends-mobile2.js"></script>-->
+</body>
+
+</html>
