@@ -131,6 +131,7 @@ function short2txt(short){
 		"COVISHIELD/AstraZeneca (combined)":"COVISHIELD/AstraZeneca",
 		"COVID-19":"COVID-19",
 		"Hypersensitivity":"hypersensitivity",
+		"Pruritis (itching)":"Pruritis (itching)",
 		"Abdominal pain upper":"abdominal pain upper",
 		"Chest pain":"Chest pain",
 		"Abdominal pain":"Abdominal pain",
@@ -282,6 +283,7 @@ function short2txt(short){
 		"Deep vein thrombosis":"Thrombose veineuse profonde",
 		"Embolism (artery blockage)":"Embolie (occlusion artérielle)",
 		"Haemorrhage (bleeding)":"Hémorragie (saignement)",
+		"Pruritis (itching)":"Prurit (démangeaisons)",
 		"Pulmonary embolism":"Embolie pulmonaire",
 		"Thrombosis (blood clot)":"Thrombose (caillot)",
 		"Bell's Palsy/Facial paralysis":"Paralysie de Bell/Paralysie faciale",
@@ -1096,7 +1098,7 @@ function figure1(data){
         
     //overlap cube transparence
     svg.append("rect")
-        .attr("x",844)
+        .attr("x",850)
         .attr("width",x.bandwidth() * 3.4)
         .attr("height",height)
         .attr("id","overlapRect")
@@ -1200,9 +1202,9 @@ function figure1(data){
             d3.select(".dosesLine").transition().duration(500).style("opacity",0);
             
             if(language == "en"){
-                document.getElementById("note").innerHTML= "<strong>Note:</strong> Although the cumulative number of adverse event reports continues to increase over time, so does the number of doses administered. Up to and including May 28, adverse event reports represented 0.028% of all doses administered.";
+                document.getElementById("note").innerHTML= "<strong>Note:</strong> Although the cumulative number of adverse event reports continues to increase over time, so does the number of doses administered. Up to and including June 4, adverse event reports represented 0.027% of all doses administered.";
             } else {
-                document.getElementById("note").innerHTML= "<strong>Remarque:</strong> Bien que le nombre cumulatif de rapports d'événements secondaires continue d'augmenter avec le temps, le nombre de doses administrées augmente également. En date du 28 mai, les rapports d'événements indésirables représentaient 0,028% de toutes les doses administrées.";
+                document.getElementById("note").innerHTML= "<strong>Remarque:</strong> Bien que le nombre cumulatif de rapports d'événements secondaires continue d'augmenter avec le temps, le nombre de doses administrées augmente également. En date du 4 juin, les rapports d'événements indésirables représentaient 0,027% de toutes les doses administrées.";
             }
             
             if(measure2 == "number"){

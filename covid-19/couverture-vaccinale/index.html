@@ -68,6 +68,17 @@
             margin-bottom: 5px;
         }
         
+        .innerBox2 {
+            flex: 0 0 97%;
+            /*border: 1px solid #ccc;*/
+            /*border-radius: 10px;*/
+            margin-left: 0px;
+            margin-right: 3px;
+            text-decoration: none;
+            color: black;
+            margin-bottom: 5px;
+        }
+        
         .boxHeader {
             flex: 0 0 98%;
             margin: 5px;
@@ -285,7 +296,7 @@
             
             
             <a href="#a3" data-figure="1" class="anchor">
-                <div class="boxHeader">Ayant reçu <abbr title = "a reçu une dose ou les deux doses">au moins</abbr> une dose<span class="keyupdatesbox1"></span></span></div>
+                <div class="boxHeader">Ayant reçu <abbr title = "a reçu une dose ou les deux doses">au moins une dose</abbr><span class="keyupdatesbox1"></span></span></div>
                 <div class="innerBox">
                     <div class="mrgn-tp-md mrgn-bttm-lg">
                         <p>Population totale</p>
@@ -294,7 +305,7 @@
                 </div>
                 <div class="innerBox">
                     <div class="mrgn-tp-md mrgn-bttm-lg">
-                        <p>18 ans et plus</p>
+                        <p>12 ans et plus</p>
                         <p class="h2"><span class="prop_atleast1dose_txt2"></span> <small>(<span class="numtotal_atleast1dose_txt2"></span>)</small></p>
                     </div>
                 </div>
@@ -309,7 +320,7 @@
                 </div>
                 <div class="innerBox">
                     <div class="mrgn-tp-md mrgn-bttm-lg">
-                        <p>18 ans et plus</p>
+                        <p>12 ans et plus</p>
                         <p class="h2"><span class="prop_partially_txt2"></span> <small>(<span class="numtotal_partially_txt2"></span>)</small></p>
                     </div>
                 </div>
@@ -324,40 +335,40 @@
                 </div>
                 <div class="innerBox">
                     <div class="mrgn-tp-md mrgn-bttm-lg">
-                        <p>18 ans et plus</p>
+                        <p>12 ans et plus</p>
                         <p class="h2"><span class="prop_fully_txt2"></span> <small>(<span class="numtotal_fully_txt2"></span>)</small></p>
                     </div>
                 </div>
             </a>
             <a href="#a3" data-figure="1" class="anchor">
                 <div class="boxHeader"><abbr title = "a reçu une dose sur deux">Partiellement</abbr> vaccinée depuis le rapport précédent <span class="nowrap"><span class="keyupdatesbox4"></span></span></div>
-                <div class="innerBox">
+                <div class="innerBox2">
                     <div class="mrgn-tp-md mrgn-bttm-lg">
                         <p>Population totale</p>
                         <p class="h2"><span class="propweekdelta_atleast1dose_txt"></span> <small>(<span class="numweekdelta_atleast1dose_txt"></span>)</small></p>
                     </div>
                 </div>
-                <div class="innerBox">
-                    <div class="mrgn-tp-md mrgn-bttm-lg">
-                        <p>18 ans et plus</p>
-                        <p class="h2"><span class="propweekdelta_atleast1dose_txt2"></span> <small>(<span class="numweekdelta_atleast1dose_txt2"></span>)</small></p>
-                    </div>
-                </div>
+                <!--<div class="innerBox">-->
+                <!--    <div class="mrgn-tp-md mrgn-bttm-lg">-->
+                <!--        <p>18 ans et plus</p>-->
+                <!--        <p class="h2"><span class="propweekdelta_atleast1dose_txt2"></span> <small>(<span class="numweekdelta_atleast1dose_txt2"></span>)</small></p>-->
+                <!--    </div>-->
+                <!--</div>-->
             </a>
             <a href="#a3" data-figure="1" class="anchor">
                 <div class="boxHeader"><abbr title = "a reçu les deux doses">Entièrement</abbr> vaccinée depuis le rapport précédent <span class="nowrap"><span class="keyupdatesbox5"></span></span></div>
-                <div class="innerBox">
+                <div class="innerBox2">
                     <div class="mrgn-tp-md mrgn-bttm-lg">
                         <p>Population totale</p>
                         <p class="h2"><span class="propweekdelta_fully_txt"></span> <small>(<span class="numweekdelta_fully_txt"></span>)</small></p>
                     </div>
                 </div>
-                <div class="innerBox">
-                    <div class="mrgn-tp-md mrgn-bttm-lg">
-                        <p>18 ans et plus</p>
-                        <p class="h2"><span class="propweekdelta_fully_txt2"></span> <small>(<span class="numweekdelta_fully_txt2"></span>)</small></p>
-                    </div>
-                </div>
+                <!--<div class="innerBox">-->
+                <!--    <div class="mrgn-tp-md mrgn-bttm-lg">-->
+                <!--        <p>18 ans et plus</p>-->
+                <!--        <p class="h2"><span class="propweekdelta_fully_txt2"></span> <small>(<span class="numweekdelta_fully_txt2"></span>)</small></p>-->
+                <!--    </div>-->
+                <!--</div>-->
             </a>
             
             <!--<a href="#a3" data-figure="1">-->
@@ -706,11 +717,17 @@
                         <td>0%</td>
                         <td>0%</td>
                     </tr>
+                    <tr>
+                        <td>Combinaison</td>
+                        <td><span class="combination_prop_atleast1dose_txt"></span> <small>(<span class="combination_num_atleast1dose_txt"></span>)</small></td>
+                        <td><span class="combination_prop_partially_txt"></span> <small>(<span class="combination_num_partially_txt"></span>)</small></td>
+                        <td><span class="combination_prop_fully_txt"></span> <small>(<span class="combination_num_fully_txt"></span>)</small></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
         
-        <div><p><strong>Remarque</strong><br>Les données selon le vaccin rapportées par le Québec n'étaient pas disponibles selon le statut vaccinal. Elles sont incluses dans le nombre et le pourcentage cumulatifs de personnes ayant reçu au moins une dose d'un vaccin contre la COVID-19, mais elles ne sont pas incluses dans le nombre de personnes partiellement ou entièrement vaccinées.</p></div>
+        <div><p><strong>Remarque</strong><br>Les données selon le vaccin rapportées par le Québec n'étaient pas disponibles selon le statut vaccinal. Puisqu’elles sont incluses que dans le nombre et le pourcentage cumulatifs de personnes ayant reçu au moins une dose d'un vaccin contre la COVID-19, la somme du nombre de personnes partiellement et entièrement vaccinées ne sera pas égale au nombre de personnes ayant reçu au moins une dose d'un vaccin contre la COVID-19 dans ce tableau.</p></div>
         
         <h3 class="figTitle">Figure 4.
             <select id="fig6-ddl-1" class="fig6">
@@ -892,6 +909,7 @@
         <h2>Liens connexes</h2>
         <ul>
             <li><a href="https://www.canada.ca/fr/sante-publique/services/maladies/maladie-coronavirus-covid-19/vaccins.html">Vaccins contre la COVID-19</a></li>
+            <li><a href="https://www.canada.ca/fr/sante-publique/services/publications/vaccins-immunisation/enquete-couverture-vaccinale-contre-covid-19.html">Enquête sur la couverture vaccinale contre la COVID-19 (ECVCC)</a></li>
             <li><a href="https://www.canada.ca/fr/sante-publique/services/maladies/maladie-coronavirus-covid-19.html">Coronavirus (COVID-19) au Canada</a></li>
             <li><a href="https://www.canada.ca/fr/sante-publique/services/maladies/2019-nouveau-coronavirus/prevention-risques/covid-19-vaccins-traitements/deploiement-vaccin.html">Distribution du vaccin</a></li>
             <li><a href="https://sante-infobase.canada.ca/covid-19/securite-vaccins/">Effets secondaires signalés après la vaccination contre la COVID-19</a></li>
@@ -906,7 +924,7 @@
             <li><a href="https://www.canada.ca/fr/sante-publique/services/immunisation/comite-consultatif-national-immunisation-ccni/orientations-administration-prioritaire-premieres-doses-vaccine-covid-19.html">Lignes directrices sur l’administration prioritaire des premières doses du vaccin contre la COVID-19</a></li>
         </ul>
         
-        <h3>Pages Web provinciales et territoriales sur la vaccination contre la COVID-19</h3>
+        <h3>Pages web provinciales, territoriales et fédérales sur la vaccination contre la COVID-19</h3>
         <ul>
             <li><a href="https://www2.gov.bc.ca/gov/content/covid-19/translation/fr/immunization" rel="external">Colombie-Britannique</a></li>
             <li><a href="https://www.alberta.ca/stats/covid-19-alberta-statistics.htm" rel="external">Alberta</a> (en anglais seulement)</li>
@@ -921,6 +939,8 @@
             <li><a href="https://yukon.ca/fr/nombre-de-cas-de-covid-19" rel="external">Yukon</a></li>
             <li><a href="https://www.gov.nt.ca/covid-19/fr" rel="external">Territoires du Nord-Ouest</a></li>
             <li><a href="https://www.gov.nu.ca/fr/sante/information/vaccination-contre-la-covid-19" rel="external">Nunavut</a></li>
+            <li><a href="https://www.sac-isc.gc.ca/fra/1606941379837/1606941507767" rel="external">Services Autochthones Canada</a></li>
+            <li><a href="https://www.canada.ca/fr/service-correctionnel/campagnes/covid-19/vaccination-scc/vaccins-table.html" rel="external">Service correctionnel Canada</a></li>
         </ul>
         
         <div class="containerTopPage">
@@ -1058,7 +1078,7 @@
         </div>
     </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CArray.prototype.sort"></script>
     <script src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
     <script src="/src/wet-boew/js/wet-boew.min.js"></script>
     <script src="/src/GCWeb/js/theme.min.js"></script>

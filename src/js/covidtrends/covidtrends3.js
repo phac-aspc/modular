@@ -284,6 +284,7 @@ function processVaxUpdateDate(data){
 }
 
 var vaxData;
+var vaxDataMap;
 function processVaccination(data){
 	// console.log(data)
 	vaxData = d3.nest()

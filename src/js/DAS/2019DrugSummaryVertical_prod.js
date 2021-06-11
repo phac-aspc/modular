@@ -308,7 +308,7 @@ let lastYearSameQuarter = {
     }
 }
 
-//add year/quarter 
+//add year/quarter
 let benzoLastYear = {
     "2020": {
         "all": { "ON": 867, "AB": 272, "QC": 1295, "MB": 54, "NS": 69, "NB": 65, "BC": 270, "SK": 20, "NL": 35, "PE": 2, "T": 4, "CA": 2953 }
@@ -344,14 +344,24 @@ drugSummary["Quarters"] = {};
 drugSummary["Quarters"]["Count"] = {};
 drugSummary["Quarters"]["Quant"] = {};
 
-let queryStringOptions = ["CA", "ON", "NL", "QC", "AB", "MB", "SK", "BC", "NS", "NB", "T", "PE"]
+let queryStringOptions = {
+    "p": ["CA", "ON", "NL", "QC", "AB", "MB", "SK", "BC", "NS", "NB", "T", "PE"],
+    "y": {
+        "2020": ["all"],
+        "2021": ["Q1"]
+    }
+}
 let queryStringValues = getParams()
-if (typeof(queryStringValues.p) != "undefined") {
-    if (queryStringOptions.indexOf(queryStringValues.p) != -1) {
-        let value = queryStringValues.p;
-        curProvince = value;
-        $("#selectProvince").val(curProvince).change();
-        $("#selectProvinceTrend").val(curProvince).change();
+if (typeof(queryStringValues.p) != "undefined" || typeof(queryStringValues.y) != "undefined" || typeof(queryStringValues.q) != "undefined") {
+    if (queryStringOptions["p"].indexOf(queryStringValues.p) != -1 && typeof(queryStringOptions["y"][queryStringValues.y]) != "undefined") {
+        if (queryStringOptions["y"][queryStringValues.y].indexOf(queryStringValues.q) != -1) {
+            let value = queryStringValues.p;
+            curProvince = value;
+            $("#selectProvince").val(curProvince).change();
+            $("#selectProvinceTrend").val(curProvince).change();
+            $("#years").val(queryStringValues.y).change()
+            $("#quarters").val(queryStringValues.q).change()
+        }
     }
 }
 
@@ -453,7 +463,7 @@ let getDataForProvinceByQuarter = function(q, p) {
 
 
 
-    // this finds the total exhibits
+    // this finds the total samples
     //console.log(byProvince)
 
     totalForLocation = totalsForLocations[$("#years").val()][q][p];
@@ -520,6 +530,7 @@ let createPanCanTable = function(data) {
         titleText = "Totaux pan-canadiens pour les opioïdes, les benzodiazépines, les stimulants et le cannabis"
     }
     d3.select("#panCanTile").select("#panCanTableContainer").select("table").select("tbody").remove()
+    d3.select("#panCanTile").select("#panCanTableContainer").select("caption").remove()
     var table = d3.select("#panCanTile").select("#panCanTableContainer").select("table")
         .attr("class", "table table-striped table-bordered table-hover").attr("id", "panCanTable"),
         caption = table.append("caption").text(titleText),
@@ -599,27 +610,27 @@ let generateTableData = function(data) {
         let tableRow;
         if (language == "en") {
             percent = percentFormat((count / totalCount * 100).toFixed(2)) + "%"
-            tableRow = { "Substance": titleCase(drugName), "Number of exhibits": numberFormat(count), "Percentage of total exhibits": percent };
+            tableRow = { "Substance": titleCase(drugName), "Number of samples": numberFormat(count), "Percentage of total samples": percent };
         }
         else {
             percent = percentFormat((count / totalCount * 100).toFixed(2)) + " %"
-            tableRow = { "Substance": titleCase(drugName), "Nombre de pièces à conviction": numberFormat(count), "Pourcentage du total": percent };
+            tableRow = { "Substance": titleCase(drugName), "Nombre d'échantillons": numberFormat(count), "Pourcentage du total": percent };
         }
 
 
         tableData.push(tableRow);
     });
     // if (language == "en")
-    //     tableData.push({ "Substance": "Total", "Number of exhibits": numberFormat(totalCount), "Percentage of total exhibits": "100%" });
+    //     tableData.push({ "Substance": "Total", "Number of samples": numberFormat(totalCount), "Percentage of total samples": "100%" });
 
     // else
-    //     tableData.push({ "Substance": "Total", "Nombre de pièces à conviction": numberFormat(totalCount), "Pourcentage du total": "100%" });
+    //     tableData.push({ "Substance": "Total", "Nombre d'échantillons": numberFormat(totalCount), "Pourcentage du total": "100%" });
 
     tableObj["data"] = tableData;
     if (language == "en")
-        tableObj["columns"] = ["Substance", "Number of exhibits", "Percentage of total exhibits"];
+        tableObj["columns"] = ["Substance", "Number of samples", "Percentage of total samples"];
     else
-        tableObj["columns"] = ["Substance", "Nombre de pièces à conviction", "Pourcentage du total"];
+        tableObj["columns"] = ["Substance", "Nombre d'échantillons", "Pourcentage du total"];
     tableObj["id"] = data.tileId;
     tableObj["title"] = data.title;
 
@@ -656,27 +667,27 @@ let generateMainSubTableData = function(data) {
         let tableRow;
         if (language == "en") {
             percent = (count / totalCount * 100).toFixed(2) + "%"
-            tableRow = { "Substance": titleCase(drugName), "Number of exhibits": numberFormat(count) };
+            tableRow = { "Substance": titleCase(drugName), "Number of samples": numberFormat(count) };
         }
         else {
             percent = (count / totalCount * 100).toFixed(2) + " %"
-            tableRow = { "Substance": titleCase(drugName), "Nombre de pièces à conviction": numberFormat(count) };
+            tableRow = { "Substance": titleCase(drugName), "Nombre d'échantillons": numberFormat(count) };
         }
 
 
         tableData.push(tableRow);
     });
     // if (language == "en")
-    //     tableData.push({ "Substance": "Total", "Number of exhibits": numberFormat(totalCount) });
+    //     tableData.push({ "Substance": "Total", "Number of samples": numberFormat(totalCount) });
 
     // else
-    //     tableData.push({ "Substance": "Total", "Nombre de pièces à conviction": numberFormat(totalCount) });
+    //     tableData.push({ "Substance": "Total", "Nombre d'échantillons": numberFormat(totalCount) });
 
     tableObj["data"] = tableData;
     if (language == "en")
-        tableObj["columns"] = ["Substance", "Number of exhibits"];
+        tableObj["columns"] = ["Substance", "Number of samples"];
     else
-        tableObj["columns"] = ["Substance", "Nombre de pièces à conviction"];
+        tableObj["columns"] = ["Substance", "Nombre d'échantillons"];
     tableObj["id"] = data.tileId;
     tableObj["title"] = data.title;
 
@@ -708,12 +719,11 @@ let createMainSubTable = function(data) {
 
 
 let titleCase = function(string) {
-    if (string == "NDMP34DMA")
-        console.log(string)
     if (string === "MDMA" || string === "MDA" || string === "GHB" || string == "BMDP" || ignoreTitleCase.includes(string) || ignoreTitleCaseCSV.includes(string))
         return string;
     var sentence = string.toLowerCase().split(" ");
     for (var i = 0; i < sentence.length; i++) {
+        // console.log(sentence[i])
         sentence[i] = sentence[i][0].toUpperCase() + sentence[i].slice(1);
     }
     return sentence.join(" ");
@@ -875,11 +885,11 @@ let tabulateTrends = function(data, id, title) {
     let theadUpper = thead.append("tr");
     theadUpper.append("th").text("Substance").attr("rowspan", 2)
     if (language == "en")
-        theadUpper.append("th").text("Number of exhibits").attr("colspan", columns.length - 1)
+        theadUpper.append("th").text("Number of samples").attr("colspan", columns.length - 1)
     else
-        theadUpper.append("th").text("Nombre de pièces à conviction").attr("colspan", columns.length - 1)
+        theadUpper.append("th").text("Nombre d'échantillons").attr("colspan", columns.length - 1)
 
-    // Nombre de pièces à conviction
+    // Nombre d'échantillons
     // append the header row
     thead.append("tr")
         .selectAll("th")
@@ -1031,9 +1041,9 @@ let getCannabisDrugTotals = function() {
     if (language == "en")
         descText = "Cannabis was identified in a total of " + numberFormat(totalCount) + " samples during this period. The determination of the THC level is not carried " +
         "out in samples submitted in the form of edible products. Results of these samples are thus by default reported as solids / non solids containing cannabis. " +
-        "Note: Please refer to the Cannabis Regulations for category definitions (section Definitions - Act and Regulations).";
+        "Note: Please refer to the <a href='https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-144/FullText.html' target='_blank'>Cannabis Regulations</a> for category definitions (section Definitions - Act and Regulations).";
     else {
-        descText = "Du cannabis a été identifié dans un total de " + numberFormat(totalCount) + " échantillons au cours de cette période sous la Loi sur le cannabis. La détermination du taux de THC n'est pas effectuée pour les échantillons soumis sous forme de produits comestibles. Les resultats de ces échantillons sont donc par défaut rapportés comme des substances solides/pas solides qui contiennent du cannabis. Note: Veuillez vous référer au <a href='https://laws-lois.justice.gc.ca/fra/reglements/DORS-2018-144/TexteComplet.html'>Règlement sur le cannabis</a> pour les définitions des catégories (section Definitions - Loi et règlement).";
+        descText = "Du cannabis a été identifié dans un total de " + numberFormat(totalCount) + " échantillons au cours de cette période sous la Loi sur le cannabis. La détermination du taux de THC n'est pas effectuée pour les échantillons soumis sous forme de produits comestibles. Les resultats de ces échantillons sont donc par défaut rapportés comme des substances solides/pas solides qui contiennent du cannabis. Note: Veuillez vous référer au <a target='_blank' href='https://laws-lois.justice.gc.ca/fra/reglements/DORS-2018-144/TexteComplet.html'>Règlement sur le cannabis</a> pour les définitions des catégories (section Definitions - Loi et règlement).";
     }
     return {
         tileId: "cannabisTile",
@@ -1095,11 +1105,11 @@ let getBenzoDrugTotals = function() {
     let percent;
     let increaseDecrease = "";
     if (language == "en")
-        percent = Math.abs(100 - ((totalCount / benzoLastYear[curProvince]) * 100)).toFixed(0) + "%";
+        percent = Math.abs(100 - ((totalCount / benzoLastYear[$("#years").val()][$("#quarters").val()][curProvince]) * 100)).toFixed(0) + "%";
     else
-        percent = Math.abs(100 - ((totalCount / benzoLastYear[curProvince]) * 100)).toFixed(0) + " %";
+        percent = Math.abs(100 - ((totalCount / benzoLastYear[$("#years").val()][$("#quarters").val()][curProvince]) * 100)).toFixed(0) + " %";
 
-    if (totalCount < benzoLastYear[curProvince]) {
+    if (totalCount < benzoLastYear[$("#years").val()][$("#quarters").val()][curProvince]) {
         if (language == "en")
             increaseDecrease = "decrease"
         else
@@ -1136,9 +1146,7 @@ let getBenzoDrugTotals = function() {
 };
 
 let checkIfNewSubstance = function(d) {
-    return newSubs.filter(function(drug) {
-        return drug.drug == d.key
-    }).length != 0
+    return Object.keys(newSubs[$("#years").val()][$("#quarters").val()]).indexOf(d.key) != -1;
     // return NewSubstances.includes(d.key) && d.value[0]["code impression SGIL-LIMS"] != "V";
 };
 
@@ -1181,7 +1189,7 @@ let getNewSubstancesDrugTotals = function() {
         // opioidTotalsForProvince = opioidTotalsForProvince.slice(0, 10);
         newSubstancesTotalsForProvince.splice(10, 0, othersObj);
     }
-    console.log(newSubstancesTotalsForProvince)
+    // console.log(newSubstancesTotalsForProvince)
     return {
         tileId: "newSubstancesTile",
         title: newSubTitle,
@@ -1195,7 +1203,7 @@ let checkIfOpioid = function(d) {
 
 let getOpioidDrugTotals = function() {
     let opioidTotalsForProvince;
-    console.log(curData)
+    // console.log(curData)
     // let byLab = {};
     // curData.values.forEach(function(drug) {
     //     drug.value.forEach(function(drugRow) {
@@ -1381,7 +1389,7 @@ let getControlledSubstanceDrugTotals = function() {
     }
     let title;
     if (language == "en") {
-        mainText = "A total of <strong>" + d3.format(",d")(totalForLocation) + "</strong> exhibits (including cannabis) were submitted for analysis during that period which represents a <strong>" + percent + " " + increaseDecrease + "</strong> over the same period last year.";
+        mainText = "A total of <strong>" + d3.format(",d")(totalForLocation) + "</strong> samples (including cannabis) were submitted for analysis during that period which represents a <strong>" + percent + " " + increaseDecrease + "</strong> over the same period last year.";
         title = "Most Frequently Identified Controlled Substances"
     }
     else {
@@ -1446,11 +1454,11 @@ let getStimulantDrugTotals = function() {
     let percent;
     let increaseDecrease = "";
     if (language == "en")
-        percent = Math.abs(100 - ((totalCount / stimulantLastYear[curProvince]) * 100)).toFixed(0) + "%";
+        percent = Math.abs(100 - ((totalCount / stimulantLastYear[$("#years").val()][$("#quarters").val()][curProvince]) * 100)).toFixed(0) + "%";
     else
-        percent = Math.abs(100 - ((totalCount / stimulantLastYear[curProvince]) * 100)).toFixed(0) + " %";
+        percent = Math.abs(100 - ((totalCount / stimulantLastYear[$("#years").val()][$("#quarters").val()][curProvince]) * 100)).toFixed(0) + " %";
 
-    if (totalCount < stimulantLastYear[curProvince]) {
+    if (totalCount < stimulantLastYear[$("#years").val()][$("#quarters").val()][curProvince]) {
         if (language == "en")
             increaseDecrease = "decrease"
         else
@@ -1583,18 +1591,18 @@ let generateNewSubstanceVisual = function(data) {
     //     });
 
     // <th>Drug</th>
-    //                             <th>Number of exhibits</th>
+    //                             <th>Number of samples</th>
     if ($.fn.DataTable.isDataTable("#" + data.tileId + " table")) {
         $("#" + data.tileId + " table").DataTable().destroy();
     }
     d3.select("#" + data.tileId + " .table table thead tr").selectAll("th").remove();
     if (language == "en") {
         d3.select("#" + data.tileId + " .table table thead tr").append("th").text("Substance").style("min-width", "255px")
-        d3.select("#" + data.tileId + " .table table thead tr").append("th").text("Number of exhibits")
+        d3.select("#" + data.tileId + " .table table thead tr").append("th").text("Number of samples")
     }
     else {
         d3.select("#" + data.tileId + " .table table thead tr").append("th").text("Substance").style("min-width", "255px")
-        d3.select("#" + data.tileId + " .table table thead tr").append("th").text("Nombre de pièces à conviction")
+        d3.select("#" + data.tileId + " .table table thead tr").append("th").text("Nombre d'échantillons")
     }
 
     d3.select("#" + data.tileId + " .table table tbody")
@@ -2215,9 +2223,9 @@ let generateBarGraph = function(data) {
         .attr("font-size", "18px")
         .text(function() {
             if (language == "en")
-                return "Number of exhibits"
+                return "Number of samples"
             else
-                return "Nombre de pièces à conviction"
+                return "Nombre d'échantillons"
         });
 
     gy.append("text")
@@ -2513,11 +2521,13 @@ let getDrugNameFromKey = function(name) {
     }
     else {
         if (ignoreTitleCase.includes(name) || ignoreTitleCaseCSV.includes(name))
-            return drugRow["Name - English"]
+            return drugRow["Name - French"]
         if (drugRow["Name - French"].split(" ").length > 1)
             return drugRow["Name - French"]
-        else
+        else {
+            console.log(drugRow["Name - French"])
             return titleCase(drugRow["Name - French"])
+        }
     }
 
 
@@ -2533,93 +2543,88 @@ let tablulateQuantData = function() {
     else {
         languageKey = "Name (French)"
     }
-    data.forEach(function(d, i) {
-        $("#quantTile table tbody").append("<tr><td>" + quant_lookup[d["key"]][0][languageKey] + "</td><td>" + numberFormat(d["powderQuant"]) + "</td><td>" + percentFormat(d["powderAvg"]) + "</td><td>" + numberFormat(d["tabletQuant"]) + "</td><td>" + percentFormat(d["tabletAvg"]) + "</td></tr>")
+    d3.selectAll("#quantTile table tbody *").remove()
+    // data.forEach(function(d, i) {
+    //     if (typeof(quant_lookup[d["drug"]]) != "undefined")
+    //         $("#quantTile table tbody").append("<tr><td>" + quant_lookup[d["drug"]][0][languageKey] + "</td><td>" + numberFormat(d["powderCount"]) + "</td><td>" + percentFormat(d["powderMean"]) + "</td><td>" + numberFormat(d["tabletCount"]) + "</td><td>" + percentFormat(d["tabletMean"]) + "</td></tr>")
+    // })
+
+    Object.keys(quant_lookup).forEach(function(d, i) {
+        let obj = data.filter(function(e) {
+            return e.drug == d;
+        })
+        if (obj.length == 0) {
+            $("#quantTile table tbody").append("<tr><td>" + quant_lookup[d][0][languageKey] + "</td><td>" + numberFormat(0) + "</td><td>" + percentFormat(0) + "</td><td>" + numberFormat(0) + "</td><td>" + percentFormat(0) + "</td></tr>")
+        }
+        else
+            $("#quantTile table tbody").append("<tr><td>" + quant_lookup[d][0][languageKey] + "</td><td>" + numberFormat(obj[0]["powderCount"]) + "</td><td>" + percentFormat(obj[0]["powderMean"]) + "</td><td>" + numberFormat(obj[0]["tabletCount"]) + "</td><td>" + percentFormat(obj[0]["tabletMean"]) + "</td></tr>")
+
     })
 
-    if (curProvince == "CA") {
-        $("#quantTile").css("display", "block")
-    }
-    else {
-        $("#quantTile").css("display", "none")
-    }
+    // if (curProvince == "CA") {
+    //     $("#quantTile").css("display", "block")
+    // }
+    // else {
+    //     $("#quantTile").css("display", "none")
+    // }
 
 };
 
 let generateQuantTableData = function() {
     let tableData = [];
+    let filteredData;
 
-    let curQuantData = { Powder: [], Tablets: [] };
 
+    // console.log(drugSummary["Quarters"]["Quant"])
 
-    //Get Powder Data
-    let powderData = drugSummary["Quarters"]["Quant"].filter(function(d) {
-        return (d["Units"] === "PERCENT_W") && d["Entered Result"] !== "COC"
-    });
-    powderData = d3.nest()
-        .key(function(d) {
-            return d['Entered Result'];
+    if ($("#quarters").val() == "all") {
+        filteredData = drugSummary["Quarters"]["Quant"].filter(function(d) {
+            return d.quarter.slice(0, 4) == $("#years").val();
         })
-        .rollup(function(leaves) {
-            return leaves;
+        filteredData = d3.nest()
+            .key(function(d) {
+                return d['drug'];
+            })
+            .rollup(function(leaves) {
+                return leaves;
+            })
+            .entries(filteredData);
+        // console.log(filteredData)
+
+        let quantArray = [];
+        filteredData.forEach(function(drug, i) {
+            let quantObj = { drug: drug.key, powderMean: 0, powderCount: 0, tabletMean: 0, tabletCount: 0 }
+            drug.value.forEach(function(drugObj, j) {
+
+                quantObj.powderCount += +drugObj.powderCount
+
+                if (!isNaN(drugObj.powderMean))
+                    quantObj.powderMean = +drugObj.powderMean / 3
+
+                quantObj.tabletCount += +drugObj.tabletCount
+
+                if (!isNaN(drugObj.tabletMean))
+                    quantObj.tabletMean = +drugObj.tabletMean / 3
+            })
+            quantObj.powderMean = quantObj.powderMean.toFixed(1)
+            quantObj.tabletMean = quantObj.tabletMean.toFixed(1)
+            quantArray.push(quantObj)
         })
-        .entries(powderData);
+        return quantArray;
 
-    curQuantData.Powder = powderData;
-
-    //Get Tablets Data
-    let tabletsData = drugSummary["Quarters"]["Quant"].filter(function(d) {
-        return (d["Units"] === "MG_TABLET" || d["Units"] === "MG_CAPSULE" || d["Units"] === "MG_UNIT") && d["Entered Result"] !== "COC"
-    });
-
-    tabletsData = d3.nest()
-        .key(function(d) {
-            return d['Entered Result'];
+    }
+    else {
+        filteredData = drugSummary["Quarters"]["Quant"].filter(function(d) {
+            return d.quarter.slice(0, 4) == $("#years").val() && d.quarter.slice(4) == $("#quarters").val();
         })
-        .rollup(function(leaves) {
-            return leaves;
+        filteredData.forEach(function(drugObj, i) {
+            if (drugObj.powderMean != "")
+                drugObj.powderMean = parseFloat(drugObj.powderMean).toFixed(1)
+            if (drugObj.tabletMean != "")
+                drugObj.tabletMean = parseFloat(drugObj.tabletMean).toFixed(1)
         })
-        .entries(tabletsData);
-
-    curQuantData.Tablets = tabletsData;
-
-    quantTableDrugs.forEach(function(d, i) {
-        let drugObj = { key: d, powderQuant: "0", powderAvg: "0", tabletQuant: "0", tabletAvg: "0" };
-
-        let curPowderObj = curQuantData.Powder.find(function(o) {
-            return o.key === d;
-        });
-
-        if (curPowderObj !== undefined) {
-            let averageNumericQuant = 0;
-            let total = 0;
-            curPowderObj.value.forEach(function(exhibit, j) {
-                total += parseFloat(exhibit["Numeric Quant"]);
-            });
-            averageNumericQuant = total / curPowderObj.value.length;
-            drugObj["powderQuant"] = curPowderObj.value.length;
-            drugObj["powderAvg"] = averageNumericQuant.toFixed(1);
-        }
-
-        let curTabletObj = curQuantData.Tablets.find(function(o) {
-            return o.key === d;
-        });
-
-        if (curTabletObj !== undefined) {
-            let averageNumericQuant = 0;
-            let total = 0;
-            curTabletObj.value.forEach(function(exhibit, j) {
-                total += parseFloat(exhibit["Numeric Quant"]);
-            });
-            averageNumericQuant = total / curTabletObj.value.length;
-            drugObj["tabletQuant"] = curTabletObj.value.length;
-            drugObj["tabletAvg"] = averageNumericQuant.toFixed(1);
-        }
-
-        tableData.push(drugObj);
-    });
-
-    return tableData;
+        return filteredData
+    }
 };
 
 let generatePanCanadianData = function() {
@@ -2824,7 +2829,7 @@ var frenchColumns = ["Province", "Opioïdes", "Cannabis", "Benzodiazépines", "S
 //             .attr("text-anchor", "start")
 //             .text(function(){
 //                 if(language == "en")
-//                     return "Number of exhibits"
+//                     return "Number of samples"
 //                 else
 //                     return "pièces à conviction"
 //             });
@@ -2856,7 +2861,7 @@ var frenchColumns = ["Province", "Opioïdes", "Cannabis", "Benzodiazépines", "S
 //             .attr("x", width - 24)
 //             .attr("y", 9.5)
 //             .attr("dy", "0.32em")
-//             .text(function(d, i) { 
+//             .text(function(d, i) {
 //                 if(language == "en")
 //                     return panCanData["columns"][i+1];
 //                 else
@@ -3106,10 +3111,10 @@ let generatePanCanVisual = function() {
         .attr("text-anchor", "middle")
         .text(function() {
             if (language == "en") {
-                return "Number of exhibits"
+                return "Number of samples"
             }
             else {
-                return "Nombre de pièces à conviction"
+                return "Nombre d'échantillons"
             }
         })
 
@@ -3140,17 +3145,18 @@ let generatePanCanVisual = function() {
         .on("click", function(d) {
             let value = panCanClassList[language][d["Province"]];
             if (value != curProvince) {
-                let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, value);
+                let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, value).replace(/\${year}/g, $("#years").val()).replace(/\${quarter}/g, $("#quarters").val());
                 d3.select(".pdfDownload").attr("href", newPdfString);
+                curProvince = value
                 $("#selectProvince").val(value).change();
                 $("#selectProvinceTrend").val(value).change();
                 updatePage();
                 trendChange(value);
             }
             else {
-
-                let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, "CA");
+                let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, "CA").replace(/\${year}/g, $("#years").val()).replace(/\${quarter}/g, $("#quarters").val());
                 d3.select(".pdfDownload").attr("href", newPdfString);
+                curProvince = "CA"
                 $("#selectProvince").val("CA").change();
                 $("#selectProvinceTrend").val("CA").change();
                 updatePage();
@@ -3189,7 +3195,7 @@ let generatePanCanVisual = function() {
         .selectAll("rect")
         .data(function(d) { return keys.map(function(key) { return { key: key, value: d[key] }; }); })
         .enter().append("rect")
-        .attr("x", function(d) { console.log(d); return x1(d.key); })
+        .attr("x", function(d) { return x1(d.key); })
         .attr("y", function(d) { return y(d.value); })
         .attr("width", x1.bandwidth())
         .attr("height", function(d) { return height - y(d.value); })
@@ -3224,9 +3230,9 @@ let generatePanCanVisual = function() {
     // .attr("font-size", "18px")
     // .text(function() {
     //     if (language == "en")
-    //         return "Number of exhibits (k = 1,000)"
+    //         return "Number of samples (k = 1,000)"
     //     else
-    //         return "Nombre de pièces à conviction"
+    //         return "Nombre d'échantillons"
     // });
 
     g.append("text")
@@ -3316,7 +3322,7 @@ let generatePanCanVisual = function() {
         // update the y axis:
         svg.select(".y")
             .transition()
-            .call(d3.axisLeft(y).ticks(null, "s"))
+            .call(d3.axisLeft(y).tickFormat(d3.format(',')))
             .duration(350);
 
 
@@ -3474,12 +3480,13 @@ let canadaData;
 
 //Load Data
 var csvfiles = [
-    "/src/data/DAS/2020-Q4-Final/output4.csv", //0
-    "/src/data/DAS/2020-Q4-Final/newsubs.csv", //1 
-    "/src/data/DAS/2020-Q4-Final/ignoreTitleCase.csv", //2
-    "/src/data/DAS/2020-Q4-Final/quant_lookup.csv", //3
-    "/src/data/DAS/2020-Q4-Final/quant_raw_data.csv", //4
-    "/src/data/DAS/2020-Q4-Final/das_raw_lookup.csv" //5
+    "/src/data/DAS/DAS_Raw_Data.csv", //0
+    "/src/data/DAS/newsubs_new.csv", //1
+    "/src/data/DAS/ignoreTitleCase.csv", //2
+    "/src/data/DAS/quant_lookup.csv", //3
+    "/src/data/DAS/quant_output.csv", //4
+    "/src/data/DAS/das_raw_lookup.csv", //5
+    "/src/data/DAS/trendData2020.csv" // 6
 ]
 var promises = [];
 csvfiles.forEach(function(url) {
@@ -3498,11 +3505,11 @@ if (Promise && !Promise.allSettled) {
     };
 }
 Promise.allSettled(promises).then(function(values) {
-    processData(values[0].value, values[1].value, values[2].value, values[3].value, values[4].value, values[5].value);
+    processData(values[0].value, values[1].value, values[2].value, values[3].value, values[4].value, values[5].value, values[6].value);
     return values[5].value;
 })
 
-let processData = function(outputData, newSubsData, ignoreTitleCaseData, quantLookupData, quantData, rawLookupData) {
+let processData = function(outputData, newSubsData, ignoreTitleCaseData, quantLookupData, quantData, rawLookupData, trendData) {
 
     createDropdownOptions();
 
@@ -3524,10 +3531,24 @@ let processData = function(outputData, newSubsData, ignoreTitleCaseData, quantLo
         updatePage();
         updatePanCanVisual();
 
+        tablulateQuantData();
+
     })
 
-    newSubs = newSubsData;
-
+    newSubs = d3.nest()
+        .key(function(d) {
+            return d['year'];
+        }).key(function(d) {
+            return d['quarter'];
+        })
+        .key(function(d) {
+            return d['drug'];
+        })
+        .rollup(function(leaves) {
+            return leaves;
+        })
+        .object(newSubsData);;
+    //console.log(newSubs)
     ignoreTitleCaseCSV = [];
     ignoreTitleCaseData.forEach(function(d, i) {
         ignoreTitleCaseCSV.push(d.drug)
@@ -3579,31 +3600,76 @@ let processData = function(outputData, newSubsData, ignoreTitleCaseData, quantLo
 
     lookup = rawLookupData;
 
-    $(document).ready(function() {
-        let queryStringValues = getParams(window.location.href);
-        console.log(queryStringValues)
-        if (typeof(queryStringValues.p) != "undefined") {
-            if (queryStringOptions.indexOf(queryStringValues.p) != -1) {
-                let value = queryStringValues.p;
-                curProvince = value;
-                console.log("in")
-                $("#selectProvince").val(curProvince).change();
-                $("#selectProvinceTrend").val(curProvince).change();
-                trendChange(curProvince)
+    nestedTrendData = d3.nest()
+        .key(function(d) {
+            return d['LOCATION'];
+        })
+        .rollup(function(leaves) {
+            return leaves;
+        })
+        .entries(trendData);
 
+    nestedTrendData[0].value.forEach(function(d) {
+        d.CANNABIS = +d.CANNABIS;
+        d.TOTAL = +d.TOTAL;
+        d.COCAINE = +d.COCAINE;
+        d.METHAMPHETAMINE = +d.METHAMPHETAMINE;
+        d.FENTANYL = +d.FENTANYL;
+        d.HEROIN = +d.HEROIN;
+        //,HYDROMORPHONE,OXYCODONE,MORPHINE,CODEINE
+        d.HYDROMORPHONE = +d.HYDROMORPHONE;
+        d.OXYCODONE = +d.OXYCODONE;
+        d.MORPHINE = +d.MORPHINE;
+        d.CODEINE = +d.CODEINE;
+        // d.YEAR = +d.YEAR;
+
+        d.CARFENTANIL = +d.CARFENTANIL;
+        d["FURANYL FENTANYL"] = +d["FURANYL FENTANYL"];
+        d["ACETYL FENTANYL"] = +d["ACETYL FENTANYL"];
+        d["CYCLOCPROPYL FENTANYL"] = +d["CYCLOCPROPYL FENTANYL"];
+        d["MeOAc FENTANYL"] = +d["MeOAc FENTANYL"];
+        d["OTHER ANALOGUES"] = +d["OTHER ANALOGUES"];
+    });
+
+    $(document).ready(function() {
+
+
+        let queryStringValues = getParams(window.location.href);
+        //console.log(queryStringValues)
+        if (typeof(queryStringValues.p) != "undefined" || typeof(queryStringValues.y) != "undefined" || typeof(queryStringValues.q) != "undefined") {
+            if (queryStringOptions["p"].indexOf(queryStringValues.p) != -1 && typeof(queryStringOptions["y"][queryStringValues.y]) != "undefined") {
+                if (queryStringOptions["y"][queryStringValues.y].indexOf(queryStringValues.q) != -1) {
+                    let value = queryStringValues.p;
+                    curProvince = value;
+                    $("#selectProvince").val(curProvince).change();
+                    $("#selectProvinceTrend").val(curProvince).change();
+                    $("#years").val(queryStringValues.y).change()
+                    $("#quarters").val(queryStringValues.q).change()
+                    trendChange(curProvince)
+                }
             }
+        }
+        if ($("#quarters").val() !== "all") {
+            d3.select("#trends").style("display", "none")
+            d3.select("#trendTitle").style("display", "none")
+            d3.select("#trendTables").style("display", "none")
+        }
+        else {
+            d3.select("#trends").style("display", "")
+            d3.select("#trendTitle").style("display", "")
+            d3.select("#trendTables").style("display", "")
         }
         if (curProvince == "CA") {
             curData = getDataForCanadaByQuarter();
-            d3.select("#quantTile").style("display", "block")
+            //     d3.select("#quantTile").style("display", "block")
         }
         else {
             curData = getDataForProvinceByQuarter($("#quarters").val(), curProvince);
-            console.log("in")
-            d3.select("#quantTile").style("display", "none")
+            //     console.log("in")
+            //     d3.select("#quantTile").style("display", "none")
         }
 
-        let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, curProvince);
+        let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, curProvince).replace(/\${year}/g, $("#years").val()).replace(/\${quarter}/g, $("#quarters").val());
         d3.select(".pdfDownload").attr("href", newPdfString);
 
         d3.select(".pdfDownload").attr("disabled", null)
@@ -3633,210 +3699,45 @@ let processData = function(outputData, newSubsData, ignoreTitleCaseData, quantLo
         createPanCanTable(generatePanCanTableData())
 
         updateCurTable();
+
+
+
+
+        //console.log(nestedTrendData);
+
+        // format the data
+
+
+        totalAndCan(nestedTrendData[0].value)
+        cocaineAndMeth(nestedTrendData[0].value)
+        fentAndHeroin(nestedTrendData[0].value)
+        otherOpioids(nestedTrendData[0].value)
+        mainFent(nestedTrendData[0].value)
+
+
+        let trendTablesData = createTrendTableData();
+        if (language == "en") {
+            tabulateTrends(trendTablesData.slice(0, 2), "totalAndCanTable", "Samples Received")
+            tabulateTrends(trendTablesData.slice(2, 4), "cocaineAndMethTable", "Cocaine and Methamphetamine")
+            tabulateTrends(trendTablesData.slice(4, 6), "fentAndHeroinTable", "Fentanyl and Heroin")
+            tabulateTrends(trendTablesData.slice(6, 10), "otherCommonTable", "Other Common Opioids")
+            tabulateTrends(trendTablesData.slice(10, 16), "mainFentTable", "Main Fentanyl Analogues")
+        }
+        else {
+            tabulateTrends(trendTablesData.slice(0, 2), "totalAndCanTable", "Échantillons reçus")
+            tabulateTrends(trendTablesData.slice(2, 4), "cocaineAndMethTable", "Cocaïne et méthamphétamine")
+            tabulateTrends(trendTablesData.slice(4, 6), "fentAndHeroinTable", "Fentanyl et héroïne")
+            tabulateTrends(trendTablesData.slice(6, 10), "otherCommonTable", "Autres opioïdes courants")
+            tabulateTrends(trendTablesData.slice(10, 16), "mainFentTable", "Principaux analogues du fentanyl")
+        }
+
     });
 
 
 }
-// //This file is used to get all counts
-// d3.csv("/src/data/DAS/2020-Q4-Final/output2.csv")
-//     .then(function(data) {
-//         //console.log(data)
-
-//         d3.csv("/src/data/DAS/2020-Q4-Final/newsubs.csv").then(function(newSubsCSV) {
-//             //console.log(newSubs)
-//             newSubs = newSubsCSV;
-//         })
-
-//         d3.csv("/src/data/DAS/2020-Q4-Final/ignoreTitleCase.csv").then(function(ignoreTitleCaseData) {
-//             console.log(ignoreTitleCaseData)
-//             ignoreTitleCaseCSV = [];
-//             ignoreTitleCaseData.forEach(function(d, i) {
-//                 ignoreTitleCaseCSV.push(d.drug)
-//             })
-//             console.log(ignoreTitleCaseCSV)
-
-//         })
-
-//         rawData = data;
-//         let nestedData = d3.nest()
-
-//             .key(function(d) {
-//                 return d['province'];
-//             })
-//             .key(function(d) {
-//                 return d['drug'];
-//             })
-//             .rollup(function(leaves) {
-//                 return leaves;
-//             })
-//             .entries(data);
-//         console.log(nestedData)
-
-//         drugSummary["Quarters"]["Count"] = nestedData;
-
-//         canadaData = d3.nest()
-//             .key(function(d) {
-//                 return d['drug'];
-//             })
-//             .rollup(function(leaves) {
-//                 return leaves;
-//             })
-//             .entries(data);
-//         d3.csv("/src/data/DAS/2020-Q4-Final/quant_lookup.csv")
-//             .then(function(quantlookup) {
-//                 //console.log(quantlookup)
-//                 quant_lookup = d3.nest()
-//                     .key(function(d) {
-//                         return d['Code'];
-//                     })
-//                     .object(quantlookup);
-//                 //console.log(quant_lookup)
-//             })
-//         //This file is used to get all quantities
-//         d3.csv("/src/data/DAS/2020-Q4-Final/quant_raw_data.csv")
-//             .then(function(data) {
-//                 drugSummary["Quarters"]["Quant"] = data;
-//             })
-//             .then(function() {
-//                 tablulateQuantData();
-//             })
-//             .catch(function(error) {
-//                 // handle error
-//             });
-
-
-//         d3.csv("/src/data/DAS/2020-Q4-Final/das_raw_lookup.csv")
-//             .then(function(data) {
-//                 lookup = data;
-//             })
-//             .then(function() {
-//                 $(document).ready(function() {
-//                     let queryStringValues = getParams(window.location.href);
-//                     console.log(queryStringValues)
-//                     if (typeof(queryStringValues.p) != "undefined") {
-//                         if (queryStringOptions.indexOf(queryStringValues.p) != -1) {
-//                             let value = queryStringValues.p;
-//                             curProvince = value;
-//                             console.log("in")
-//                             $("#selectProvince").val(curProvince).change();
-//                             $("#selectProvinceTrend").val(curProvince).change();
-//                             trendChange(curProvince)
-
-//                         }
-//                     }
-//                     if (curProvince == "CA") {
-//                         curData = getDataForCanadaByQuarter();
-//                         d3.select("#quantTile").style("display", "block")
-//                     }
-//                     else {
-//                         curData = getDataForProvinceByQuarter("all", curProvince);
-//                         console.log("in")
-//                         d3.select("#quantTile").style("display", "none")
-//                     }
-
-//                     let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, curProvince);
-//                     d3.select(".pdfDownload").attr("href", newPdfString);
-
-//                     d3.select(".pdfDownload").attr("disabled", null)
-
-
-//                     updateTitle();
-
-//                     generateTile(getCannabisDrugTotals());
-
-//                     generateTile(getControlledSubstanceDrugTotals());
-
-//                     generateTile(getOpioidDrugTotals());
-
-//                     generateNewSubstanceVisual(getNewSubstancesDrugTotals());
-//                     let newSubData = getNewSubstancesDrugTotals();
-//                     newSubData.data = newSubData.data.slice(0, 11);
-//                     generateBarGraph(newSubData);
 
 
 
-
-//                     generateTile(getBenzoDrugTotals());
-
-//                     generateTile(getStimulantDrugTotals());
-
-//                     generatePanCanVisual();
-//                     createPanCanTable(generatePanCanTableData())
-
-//                     updateCurTable();
-//                 });
-//             })
-//             .catch(function(error) {
-//                 // handle error
-//             });
-//         return drugSummary;
-//     })
-//     .catch(function(error) {
-//         // handle error
-//     });
-
-d3.csv("/src/data/DAS/2020-Q4-Final/trendData2020.csv").then(function(data) {
-    nestedTrendData = d3.nest()
-        .key(function(d) {
-            return d['LOCATION'];
-        })
-        .rollup(function(leaves) {
-            return leaves;
-        })
-        .entries(data);
-
-
-
-    //console.log(nestedTrendData);
-
-    // format the data
-    nestedTrendData[0].value.forEach(function(d) {
-        d.CANNABIS = +d.CANNABIS;
-        d.TOTAL = +d.TOTAL;
-        d.COCAINE = +d.COCAINE;
-        d.METHAMPHETAMINE = +d.METHAMPHETAMINE;
-        d.FENTANYL = +d.FENTANYL;
-        d.HEROIN = +d.HEROIN;
-        //,HYDROMORPHONE,OXYCODONE,MORPHINE,CODEINE
-        d.HYDROMORPHONE = +d.HYDROMORPHONE;
-        d.OXYCODONE = +d.OXYCODONE;
-        d.MORPHINE = +d.MORPHINE;
-        d.CODEINE = +d.CODEINE;
-        // d.YEAR = +d.YEAR;
-
-        d.CARFENTANIL = +d.CARFENTANIL;
-        d["FURANYL FENTANYL"] = +d["FURANYL FENTANYL"];
-        d["ACETYL FENTANYL"] = +d["ACETYL FENTANYL"];
-        d["CYCLOCPROPYL FENTANYL"] = +d["CYCLOCPROPYL FENTANYL"];
-        d["MeOAc FENTANYL"] = +d["MeOAc FENTANYL"];
-        d["OTHER ANALOGUES"] = +d["OTHER ANALOGUES"];
-    });
-
-    totalAndCan(nestedTrendData[0].value)
-    cocaineAndMeth(nestedTrendData[0].value)
-    fentAndHeroin(nestedTrendData[0].value)
-    otherOpioids(nestedTrendData[0].value)
-    mainFent(nestedTrendData[0].value)
-
-
-    let trendTablesData = createTrendTableData();
-    if (language == "en") {
-        tabulateTrends(trendTablesData.slice(0, 2), "totalAndCanTable", "Samples Received")
-        tabulateTrends(trendTablesData.slice(2, 4), "cocaineAndMethTable", "Cocaine and Methamphetamine")
-        tabulateTrends(trendTablesData.slice(4, 6), "fentAndHeroinTable", "Fentanyl and Heroin")
-        tabulateTrends(trendTablesData.slice(6, 10), "otherCommonTable", "Other Common Opioids")
-        tabulateTrends(trendTablesData.slice(10, 16), "mainFentTable", "Main Fentanyl Analogues")
-    }
-    else {
-        tabulateTrends(trendTablesData.slice(0, 2), "totalAndCanTable", "Échantillons reçus")
-        tabulateTrends(trendTablesData.slice(2, 4), "cocaineAndMethTable", "Cocaïne et méthamphétamine")
-        tabulateTrends(trendTablesData.slice(4, 6), "fentAndHeroinTable", "Fentanyl et héroïne")
-        tabulateTrends(trendTablesData.slice(6, 10), "otherCommonTable", "Autres opioïdes courants")
-        tabulateTrends(trendTablesData.slice(10, 16), "mainFentTable", "Principaux analogues du fentanyl")
-    }
-
-
-});
 
 let updateTotalAndCan = function(data) {
     var margin = { top: 20, right: 20, bottom: 120, left: 70 },
@@ -3993,10 +3894,10 @@ let totalAndCan = function(data) {
         .attr("text-anchor", "middle")
         .text(function() {
             if (language == "en") {
-                return "Number of exhibits"
+                return "Number of samples"
             }
             else {
-                return "Nombre de pièces à conviction"
+                return "Nombre d'échantillons"
             }
         })
 
@@ -4178,10 +4079,10 @@ let cocaineAndMeth = function(data) {
         .attr("text-anchor", "middle")
         .text(function() {
             if (language == "en") {
-                return "Number of exhibits"
+                return "Number of samples"
             }
             else {
-                return "Nombre de pièces à conviction"
+                return "Nombre d'échantillons"
             }
         })
 
@@ -4450,10 +4351,10 @@ let fentAndHeroin = function(data) {
         .attr("text-anchor", "middle")
         .text(function() {
             if (language == "en") {
-                return "Number of exhibits"
+                return "Number of samples"
             }
             else {
-                return "Nombre de pièces à conviction"
+                return "Nombre d'échantillons"
             }
         })
 
@@ -4728,10 +4629,10 @@ let otherOpioids = function(data) {
         .attr("text-anchor", "middle")
         .text(function() {
             if (language == "en") {
-                return "Number of exhibits"
+                return "Number of samples"
             }
             else {
-                return "Nombre de pièces à conviction"
+                return "Nombre d'échantillons"
             }
         })
 
@@ -5090,10 +4991,10 @@ let mainFent = function(data) {
         .attr("text-anchor", "middle")
         .text(function() {
             if (language == "en") {
-                return "Number of exhibits"
+                return "Number of samples"
             }
             else {
-                return "Nombre de pièces à conviction"
+                return "Nombre d'échantillons"
             }
         })
 
@@ -5521,7 +5422,7 @@ let createTrendTableData = function() {
 
         dataArray.push(trendObj);
     })
-    console.log(dataArray)
+    // console.log(dataArray)
 
     dataArray.splice(2, 1, dataArray.splice(3, 1, dataArray[2])[0]);
     //Substance:tasd, 2012:123, 2013:123, ...
@@ -5590,11 +5491,11 @@ let trendChange = function(value) {
         tabulateTrends(trendTablesData.slice(10, 16), "mainFentTable", "Principaux analogues du fentanyl")
     }
 }
-const pdfString = "/src/data/DAS/2020-Q4-Final/pdf/${lang}/DAS_2021_Final_${lang}_${province}.pdf"
+const pdfString = "/src/data/DAS/pdf/${lang}/DAS_${year}${quarter}_${lang}_${province}.pdf"
 
 d3.select("#selectProvinceTrend").on("change", function() {
     let value = d3.select(this).node().value;
-    let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, value);
+    let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, value).replace(/\${year}/g, $("#years").val()).replace(/\${quarter}/g, $("#quarters").val());
     d3.select(".pdfDownload").attr("href", newPdfString);
     $("#selectProvince").val(value);
     $("#selectProvince").change();
@@ -5607,7 +5508,7 @@ d3.select("#selectProvinceTrend").on("change", function() {
 
 d3.select("#selectProvince").on("change", function() {
     let value = d3.select(this).node().value;
-    let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, value);
+    let newPdfString = pdfString.replace(/\${lang}/g, language).replace(/\${province}/g, value).replace(/\${year}/g, $("#years").val()).replace(/\${quarter}/g, $("#quarters").val());
     d3.select(".pdfDownload").attr("href", newPdfString);
     $("#selectProvinceTrend").val(value);
     $("#selectProvinceTrend").change();
@@ -5617,11 +5518,11 @@ d3.select("#selectProvince").on("change", function() {
 });
 
 let updatePage = function() {
-    // if (curProvince !== "") {
-    if (d3.select(".provinceGroup rect." + curProvince).node() !== null)
-        d3.select(".provinceGroup rect." + curProvince).transition().duration(350).style("opacity", 0);
-    // }
-    if (curProvince == d3.select('#selectProvince').node().value) {
+    // // if (curProvince !== "") {
+    // if (d3.select(".provinceGroup rect." + curProvince).node() !== null)
+    //     d3.select(".provinceGroup rect." + curProvince).transition().duration(350).style("opacity", 0);
+    // // }
+    if (d3.select('#selectProvince').node().value == "CA") {
         d3.select(".provinceGroup rect." + curProvince).transition().duration(350).style("opacity", 0);
         curProvince = "CA"
         $("#selectProvince").val(curProvince);
@@ -5633,28 +5534,27 @@ let updatePage = function() {
     }
     else {
         curProvince = d3.select('#selectProvince').node().value;
+        d3.selectAll(".provinceGroup rect").transition().duration(350).style("opacity", 0);
         d3.select(".provinceGroup rect." + curProvince).style("opacity", 0.1).transition().duration(350).style("opacity", 0.1);
-
-
     }
-    window.history.replaceState(null, null, window.location.origin + window.location.pathname + '?p=' + curProvince);
+    window.history.replaceState(null, null, window.location.origin + window.location.pathname + '?p=' + curProvince + "&y=" + $("#years").val() + "&q=" + $("#quarters").val());
 
     if (curProvince === "CA") {
         curData = getDataForCanadaByQuarter();
-        d3.select("#quantTile").style("display", "block")
+        //     d3.select("#quantTile").style("display", "block")
 
     }
     else {
         curData = getDataForProvinceByQuarter($("#quarters").val(), curProvince);
-        d3.select("#quantTile").style("display", "none")
+        //     d3.select("#quantTile").style("display", "none")
 
     }
     updateTitle();
     updateTile(getControlledSubstanceDrugTotals());
 
-    console.log(getCannabisDrugTotals())
+    // console.log(getCannabisDrugTotals())
     updateTile(getCannabisDrugTotals());
-    console.log(curData)
+    // console.log(curData)
 
     updateTile(getOpioidDrugTotals());
 
@@ -5912,7 +5812,7 @@ function axis(orient, scale) {
             .attr("stroke", "currentColor")
             .attr(x + "2", k * tickSizeInner));
 
-        // textEnter = 
+        // textEnter =
 
         text = text.merge(tickEnter.append("text")
             .attr("fill", "currentColor")

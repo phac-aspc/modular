@@ -53,7 +53,7 @@ const greens4 = ["#c2e699","#78c679","#006837","#bfbfbf"];
 const greens3 = ["#c2e699","#78c679","#006837"];
 const greens3reverse = ["#006837","#78c679","#c2e699"];
 // const greens4reverse = ["#006837","#c2e699","#bfbfbf","#000000"];
-const greens4reverse = ["#ceecc5","#a1d99b","#31a354","#23763c","#efefa2","#bfbfbf"];
+const greens4reverse = ["#ceecc5","#a1d99b","#31a354","#23763c","#123b1e","#efefa2","#bfbfbf"];
 // ["#31a354","#a1d99b","#e5f5e0","#bfbfbf","#000000"];
 
 // const greens4reverse = ["#238b45","#74c476","#bae4b3","#edf8e9","#bfbfbf","#000000"]; New vaccines
@@ -251,9 +251,10 @@ function prov2pruid(prov){
 }
 function short2txt(short){
 	let shortLookup = {
-		"m":"Male",
-		"f":"Female",
+		"Male":"Male",
+		"Female":"Female",
 		"Other":"Other",
+		"Combination":"Combination",
 		"Unknown":"Unknown",
 		"Not reported":"Not reported",
 		"Not reported v":"Vaccine not reported",
@@ -276,10 +277,11 @@ function short2txt(short){
 		"Fully vaccinated": "Fully vaccinated"
 	}
 	let shortLookupFR = {
-		"m":"Hommes",
-		"f":"Femmes",
+		"Male":"Hommes",
+		"Female":"Femmes",
 		"Unknown":"Inconnu",
 		"Other":"Autres",
+		"Combination":"Combinaison",
 		"Not reported":"Non rapporté",
 		"Not reported v":"Vaccin non spécifié",
 		"Not reported as":"Non spécifiés",
@@ -630,7 +632,7 @@ function processData(data_overall,data_keyPop,data_byAge,data_denoms,data_byVacc
 	        })
 	        .entries(data_denoms)
 	    
-		var nestedData_byVacSortOrder = ["Pfizer-BioNTech", "Moderna", "COVISHIELD", "AstraZeneca", "Unknown", "Not reported"];
+		var nestedData_byVacSortOrder = ["Pfizer-BioNTech", "Moderna", "COVISHIELD", "AstraZeneca", "Combination", "Unknown", "Not reported"];
 	    nestedData_byVac = d3.nest()
 	        .key(function(d){
 	            return d["pruid"];
@@ -965,7 +967,7 @@ function processData(data_overall,data_keyPop,data_byAge,data_denoms,data_byVacc
 					extraNotes = ' Use caution when comparing data over time. Some increases are due to jurisdictions providing their first reports on different weeks. Reporting delays can result in artificial changes in weekly counts. Information is subject to change and may differ from provincial and territorial reports, due to the suppression of values less than five for seven provinces and territories and the timing of updates (see <a href="/covid-19/vaccination-coverage/technical-notes.html#a6">limitations</a>).';
 					d3.selectAll(".mapnotes").html("<h4>Note</h4><p>" + note1Text + extraNotes + "</p><p>" + note2Text + "</p>");
 				}else{
-					extraNotes = ' Les tendances temporelles doivent être interprétées avec prudence. Certaines augmentations sont dues au fait que les provinces ou territoires ont fourni leurs premiers rapports sur différentes semaines. Les retards dans la soumission des rapports peuvent entraîner des changements artificiels au nombre de personnes vaccinées par semaine. Les informations sont sujettes à changement et peuvent différer des rapports provinciaux et territoriaux selon le moment où les données sont mises à jour et puisque les valeurs inférieures à cinq ont été supprimées pour sept provinces et territoires (voir <a href="/covid-19/couverture-vaccinale/notes-techniques.html#a6">limites</a>).';
+					extraNotes = ' Les tendances temporelles doivent être interprétées avec prudence.  Les informations sont sujettes à changement et peuvent différer des rapports provinciaux et territoriaux selon le moment où les données sont mises à jour et puisque les valeurs inférieures à cinq ont été supprimées pour sept provinces et territoires (voir <a href="/covid-19/couverture-vaccinale/notes-techniques.html#a6">limites</a>).';
 					d3.selectAll(".mapnotes").html("<h4>Remarque</h4><p>" + note1Text + extraNotes + "</p><p>" + note2Text + "</p>");
 				}
 			}else if(d.Location == "Age Sex - Bar Chart - Coverage"){
@@ -989,7 +991,7 @@ function processData(data_overall,data_keyPop,data_byAge,data_denoms,data_byVacc
 					extraNotes = ' Use caution when comparing data over time. Some increases are due to provinces and territories providing their first reports on different weeks. Reporting delays can result in artificial changes in weekly counts. Information is subject to change and may differ from provincial and territorial reports, due to the suppression of values less than five for seven provinces and territories and the timing of updates (see <a href="/covid-19/vaccination-coverage/technical-notes.html#a6">limitations</a>).'; // Data on adults in remote and isolated Indigenous communities will be included in future reports, when available.';
 					d3.select("#keypopslinenotes").html("<h4>Note</h4><p>" + note1Text + extraNotes + "</p><p>" + note2Text + "</p>");
 				}else{
-					extraNotes = ' Les tendances temporelles doivent être interprétées avec prudence. Certaines augmentations sont dues au fait que les provinces ou territoires ont fourni leurs premiers rapports sur différentes semaines. Les retards dans la soumission des rapports peuvent entraîner des changements artificiels au nombre de personnes vaccinées par semaine. Les informations sont sujettes à changement et peuvent différer des rapports provinciaux et territoriaux selon le moment où les données sont mises à jour et puisque les valeurs inférieures à cinq ont été supprimées pour sept provinces et territoires (voir <a href="/covid-19/couverture-vaccinale/notes-techniques.html#a6">limites</a>).'; // Les données portant sur les adultes des communautés autochtones éloignées et isolées seront ajoutées dans les prochains rapports lorsqu’elles seront disponibles.';
+					extraNotes = ' Les tendances temporelles doivent être interprétées avec prudence. Les retards dans la soumission des rapports peuvent entraîner des changements artificiels au nombre de personnes vaccinées par semaine. Les informations sont sujettes à changement et peuvent différer des rapports provinciaux et territoriaux selon le moment où les données sont mises à jour et puisque les valeurs inférieures à cinq ont été supprimées pour sept provinces et territoires (voir <a href="/covid-19/couverture-vaccinale/notes-techniques.html#a6">limites</a>).'; // Les données portant sur les adultes des communautés autochtones éloignées et isolées seront ajoutées dans les prochains rapports lorsqu’elles seront disponibles.';
 					d3.select("#keypopslinenotes").html("<h4>Remarque</h4><p>" + note1Text + extraNotes + "</p><p>" + note2Text + "</p>");
 				}
 			}else if(d.Location == "Map - Administration Distribution"){
@@ -1009,7 +1011,7 @@ function processData(data_overall,data_keyPop,data_byAge,data_denoms,data_byVacc
 function buildKeyUpdates() {
     var timeArrayEndPos = timeArray.length-1;
     var popGroupTotal = overall_nestedData[timeArrayEndPos].values.map(function(d,i){ return d.key }).indexOf("total");
-    var popGroup18 = overall_nestedData[timeArrayEndPos].values.map(function(d,i){ return d.key }).indexOf("18+");
+    var popGroup12 = overall_nestedData[timeArrayEndPos].values.map(function(d,i){ return d.key }).indexOf("12+");
     //d3.selectAll(".numtotal_doses_txt").text(numberFormat(+overall_nestedData[timeArrayEndPos].values[0].numtotal_partially+2*overall_nestedData[timeArrayEndPos].values[0].numtotal_fully))
    
     //Pop group - total
@@ -1026,17 +1028,17 @@ function buildKeyUpdates() {
     d3.selectAll(".numweekdelta_fully_txt").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroupTotal].values[0].numweekdelta_fully,"num"));
     
     //Pop group - 18+
-    d3.selectAll(".prop_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].prop_atleast1dose,"prop"));
-    d3.selectAll(".prop_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].prop_fully,"prop"));
-    d3.selectAll(".prop_partially_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].prop_partially,"prop"));
-    d3.selectAll(".numtotal_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].numtotal_atleast1dose,"num"));
-    d3.selectAll(".numtotal_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].numtotal_fully,"num"));
-    d3.selectAll(".numtotal_partially_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].numtotal_partially,"num"));
-    d3.selectAll(".propweekdelta_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].propweekdelta_atleast1dose,"prop"));
-    d3.selectAll(".propweekdelta_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].propweekdelta_fully,"prop"));
-    d3.selectAll(".propweekdelta_partially_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].propweekdelta_partially,"prop"));
-    d3.selectAll(".numweekdelta_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].numweekdelta_atleast1dose,"num"));
-    d3.selectAll(".numweekdelta_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup18].values[0].numweekdelta_fully,"num"));
+    d3.selectAll(".prop_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].prop_atleast1dose,"prop"));
+    d3.selectAll(".prop_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].prop_fully,"prop"));
+    d3.selectAll(".prop_partially_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].prop_partially,"prop"));
+    d3.selectAll(".numtotal_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].numtotal_atleast1dose,"num"));
+    d3.selectAll(".numtotal_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].numtotal_fully,"num"));
+    d3.selectAll(".numtotal_partially_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].numtotal_partially,"num"));
+    d3.selectAll(".propweekdelta_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].propweekdelta_atleast1dose,"prop"));
+    d3.selectAll(".propweekdelta_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].propweekdelta_fully,"prop"));
+    d3.selectAll(".propweekdelta_partially_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].propweekdelta_partially,"prop"));
+    d3.selectAll(".numweekdelta_atleast1dose_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].numweekdelta_atleast1dose,"num"));
+    d3.selectAll(".numweekdelta_fully_txt2").text(generateTxt(overall_nestedData[timeArrayEndPos].values[popGroup12].values[0].numweekdelta_fully,"num"));
     
     d3.selectAll(".numtotal_dosesdistributed_txt").text(numberFormat(current_numtotal_dosesdistributed));
     d3.selectAll(".date_dosesdistributed_txt").text(function(){
@@ -1099,6 +1101,9 @@ function buildKeyUpdates() {
     d3.selectAll(".astrazeneca_prop_atleast1dose_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[3].value.prop_atleast1dose,"prop"));
     d3.selectAll(".astrazeneca_prop_partially_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[3].value.prop_partially,"prop"));
     d3.selectAll(".astrazeneca_prop_fully_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[3].value.prop_fully,"prop"));
+    d3.selectAll(".combination_prop_atleast1dose_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[4].value.prop_atleast1dose,"prop"));
+    d3.selectAll(".combination_prop_partially_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[4].value.table_prop_partially,"prop"));
+    d3.selectAll(".combination_prop_fully_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[4].value.prop_fully,"prop"));
     
     d3.selectAll(".pfizer_num_atleast1dose_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[0].value.numtotal_atleast1dose,"num"));
     d3.selectAll(".pfizer_num_partially_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[0].value.numtotal_partially,"num"));
@@ -1112,6 +1117,9 @@ function buildKeyUpdates() {
     d3.selectAll(".astrazeneca_num_atleast1dose_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[3].value.numtotal_atleast1dose,"num"));
     d3.selectAll(".astrazeneca_num_partially_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[3].value.numtotal_partially,"num"));
     d3.selectAll(".astrazeneca_num_fully_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[3].value.numtotal_fully,"num"));
+    d3.selectAll(".combination_num_atleast1dose_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[4].value.numtotal_atleast1dose,"num"));
+    d3.selectAll(".combination_num_partially_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[4].value.table_numtotal_partially,"num"));
+    d3.selectAll(".combination_num_fully_txt").text(generateTxt(+nestedData_byVac[0].values[timeArrayEndPos].values[4].value.numtotal_fully,"num"));
 }
 
 //Build Figure 1. National Distribution - Map
@@ -4335,7 +4343,7 @@ function draw_fig_keyPops(_option,_vaxStat,_update){
             	})
     
     axis.append("text")
-            .attr("font-size","16px")
+            .attr("font-size","20px")
             .attr("font-weight","bold")
             .attr("text-anchor","middle")
             .attr("y",function(){
@@ -4484,7 +4492,7 @@ function draw_fig_agesex(_option,_vaxStat,pruid,_update){
 	
 	//creat new
 	var chartDim = {
-        height: 500,
+        height: 530,
         width: 1140,
         margin: {
             top: 100,
@@ -4526,8 +4534,8 @@ function draw_fig_agesex(_option,_vaxStat,pruid,_update){
    //     }
    // }
     
-    let ageGroups_arr ={en:["0-17", "18-29", "30-39","40-49","50-59", "60-69", "70-79", "80+", "Unknown", "Not reported"],fr:["0-17", "18-29", "30-39","40-49","50-59", "60-69", "70-79", "80+", "Inconnu", "Non rapporté"]};
-    let sexSubgroups_arr = ["f", "m", "Other", "Unknown", "Not reported"];
+    let ageGroups_arr ={en:["0-11", "12-17", "18-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80+", "Unknown", "Not reported"],fr:["0-11", "12-17", "18-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80+", "Inconnu", "Non rapporté"]};
+    let sexSubgroups_arr = ["Female", "Male", "Other", "Unknown", "Not reported"];
 
     let max;
     let foundNan = false;
@@ -4572,7 +4580,6 @@ function draw_fig_agesex(_option,_vaxStat,pruid,_update){
 			return sexSubgroups_arr.indexOf(a.key) - sexSubgroups_arr.indexOf(b.key);
 		})
 	})
-	console.log(data.values);
 	
     let maxPow = Math.floor(Math.log10(max));
     let max2;
@@ -5301,6 +5308,14 @@ function draw_fig_agesex(_option,_vaxStat,pruid,_update){
     	        	}else{
     	        		return "1.6em";
     	        	}
+    	        })
+    	        .attr("transform",function(d){
+    	        	if(window.innerWidth <= 760){;
+    	        		return "translate(-15,7)rotate(-15)";
+    	        	}else{
+    	        		return "";
+    	        	}
+    	        	// if()
     	        });
     	
     	axis.select("#fig5_y").selectAll(".axisTextLablez")
@@ -5345,7 +5360,7 @@ function draw_fig_agesex(_option,_vaxStat,pruid,_update){
            		})
     	
     	axis.append("text")
-    	        .attr("font-size","16px")
+    	        .attr("font-size","20px")
     	        .attr("font-weight","bold")
     	        .attr("text-anchor","middle")
     	        .attr("y",function(){
@@ -5357,7 +5372,7 @@ function draw_fig_agesex(_option,_vaxStat,pruid,_update){
     	        .attr("transform",function(){
     	            return "translate("+ 
     	                    ((chartDim.width/2))+
-    	                    ","+ chartDim.height +")";
+    	                    ","+ (+chartDim.height + 10) +")";
     	        })
     	        .append("tspan")
     	        .attr("id","fig5_xAxisLabel")
@@ -5399,7 +5414,7 @@ function draw_fig_vactype(_option,_vaxStat,pruid,_update){
     	textPadding: 10
     };
     
-    let products_arr = ["Pfizer-BioNTech","Moderna","COVISHIELD","AstraZeneca","Unknown","Not reported"];
+    let products_arr = ["Pfizer-BioNTech","Moderna","COVISHIELD","AstraZeneca","Combination","Unknown","Not reported"];
     let data;
     for(let i=0; i<nestedData_byVac2.length ; i++){
         if(nestedData_byVac2[i].key == pruid){
@@ -5967,7 +5982,7 @@ function draw_fig_vactype(_option,_vaxStat,pruid,_update){
         		.attr("font-size","16px")
         		.attr("font-weight","bold")
         		.text(function(){
-        			if(value.key == "Not reported" || value.key == "Unknown"){
+        			if(value.key == "Not reported" || value.key == "Unknown" || value.key == "Combination"){
         				if(value.key == "Not reported"){
         					return short2txt(value.key+" v");
         				}
@@ -6207,7 +6222,7 @@ function draw_fig_vactype(_option,_vaxStat,pruid,_update){
             })
     
     axis.append("text")
-            .attr("font-size","16px")
+            .attr("font-size","20px")
             .attr("font-weight","bold")
             .attr("text-anchor","middle")
             .attr("y",function(){
@@ -7086,7 +7101,7 @@ function draw_fig_covline(_option,pruid,_update){
             })
     
     axis.append("text")
-            .attr("font-size","16px")
+            .attr("font-size","20px")
             .attr("font-weight","bold")
             .attr("text-anchor","middle")
             .attr("y",function(){
