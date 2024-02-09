@@ -1859,7 +1859,7 @@ export class Map {
                 }
             })
             .on('click.tab', function(e) {
-
+                // console.log(e)
                 const isContainer = e.target.id == container.attr('id');
 
                 if (isContainer) {
@@ -1893,14 +1893,8 @@ export class Map {
         const regionId = this.#regionId;
         const regionName = this.#regionName;
         const data = this.#data;
-
-
-        // if (this.#data) {
-        //     return this.#getRegionColour(this.#data[d.properties[regionId]]);
-        // }
-        // else {
-        //     return this.#defaultColour;
-        // }
+        
+        console.log('tooltipSelection', selection)
 
         const tooltip = this.#wrapper.select(".tooltip").empty() ?
             this.#wrapper
@@ -1911,8 +1905,16 @@ export class Map {
         selection
             .on('mouseenter', (e, d) => {
                 let html;
-                console.log(d, regionId, this.#data)
-                let colour = this.#data ? this.#getRegionColour(this.#data[d.properties[regionId]]) : this.#defaultColour;
+                // console.log(d, regionId, this.#data)
+                
+                let myRegionId;
+                // if (typeof d === 'object') {
+                    myRegionId = this.#data[d.properties[regionId]];
+                // } else {
+                //     myRegionId = d;
+                // }
+                
+                let colour = this.#data ? this.#getRegionColour(myRegionId) : this.#defaultColour;
                 if (this.#tooltipFunction){
                     html = this.#tooltipFunction(d, colour);
                 } else {
@@ -1952,6 +1954,7 @@ export class Map {
         const borderColour = this.#borderColour;
         const regionId = this.#regionId;
         const regionName = this.#regionName;
+        console.log('InvisMapData', mapData)
 
         var invisPaths = invisGroup
             .selectAll(".region")
@@ -1970,16 +1973,6 @@ export class Map {
             .attr("tabindex", d => -1)
             .attr("focusable", "true")
             .attr("aria-label", d => `${d.properties[regionName]}: ${this.#getDisplayValue(this.#data, d)}`)
-        // .style("fill", d => {
-        //     if (this.#data) {
-        //         return this.#getRegionColour(this.#data[d.properties[regionId]]);
-        //     }
-        //     else {
-        //         return this.#defaultColour;
-        //     }
-
-        // })
-        // .attr("opacity", 0)
 
         if (this.#interactive) {
             this.#highlightRegion(invisPaths);
