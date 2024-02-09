@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reuseable</title>
+    
+    
+    <link rel="stylesheet" href="/src/GCWeb/css/wet-boew.min.css">
+    <link rel="stylesheet" href="/src/GCWeb/css/theme.min.css">
+    <link href="./css/dummy.css" rel="stylesheet" type="text/css">
+    <link href="./css/dummyMap.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
+    
+    <noscript>
+        <link rel="stylesheet" href="/src/wet-boew/css/noscript.min.css" />
+    </noscript>
+</head>
+<body>
+  
+<main property="mainContentOfPage" class="container">
+  <div class='row'>
+    <div class="col-md-6" id='pieWrapper'>
+      <button id="updatePie">Update pie</button>
+      <svg id='pie'></svg>
+    </div>
+    <div class='col-md-6' id="barAndLineWrapper">
+      <svg id="barAndLineContainer"></svg>
+    </div>
+    <div class='col-md-6' id="textureWrapper">
+      <svg id="textureContainer"></svg>
+    </div>
+  </div>
+  <div class='row'>
+    <div class='col-md-6' id="stackedLineWrapper">
+      <svg id="stackedLineContainer"></svg>
+    </div>
+    <div class='col-md-6' id="carssLineWrapper">
+      <svg id="carssLineContainer"></svg>
+    </div>
+  </div>
+  
+  <div class='row'>
+    <div class='col-md-6'  id='barWithUncertaintiesWrapper'>
+      <button id="updateUncertaintyBar">Update bar</button>
+      <svg id="barWithUncertaintiesContainer"></svg>
+    </div>
+    <div class='col-md-6'  id='lineWrapper'>
+      <button id="updateLine">Update line</button>
+      <svg id="lineContainer"></svg>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div id='mapGradientWrapper'>
+      <svg id='mapGradientContainer'></svg>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-6" id='pathWrapper'>
+      <button id="updatePath">Switch</button>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-6" id='mapWrapper'>
+      <button id="updateMap">Update map</button>
+      <svg id='map'></svg>
+          <div id="markerDrop">
+            put marker info when pt is __
+          </div>
+    </div>
+    <div class="col-md-6" id='mapBarchartWrapper'>
+      <svg id='mapBarchart'></svg>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6" id='hr-wrapper'>
+      <button id="updateHr">Update map</button>
+      <svg id='hr-map'></svg>
+    </div>
+  </div>
+  
+  
+  <div class="row">
+    <div class="col-md-6" id='wrapper1'>
+      <button id="updateBar1">Update bar</button>
+      <button id="toggleLog">Toggle log</button>
+      <button id="toggleProp">Toggle proportional</button>
+      <button id="toggleGrouped">Toggle grouped</button>
+      <svg id='bar1'></svg>
+    </div>
+    <div class="col-md-6" id='wrapper2'>
+      <svg id="bar2"></svg>
+    </div>
+  </div>
+  
+</main>
+  
+
+</body>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+        <!--<script src="/src/wet-boew/js/wet-boew.min.js"></script>-->
+        <!--<script src="/src/GCWeb/js/theme.min.js"></script>-->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CObject.values"></script>
+<script src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
+<script src="/src/js/datatables.js"></script>
+<script src="/src/js/topojson.v2.min.js"></script>
+<script src="/src/js/polylabel.js"></script>
+<script src="/src/js/d3.v7.min.js"></script>
+<!--for map-->
+<!--<script src="/src/js/polylabel.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>-->
+<!-- -->
+<!--for datatables-->
+<!--<script-->
+<!--  src="https://code.jquery.com/jquery-3.7.0.min.js"-->
+<!--  integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="-->
+<!--  crossorigin="anonymous"></script>-->
+<!--<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>-->
+<script src="/src/js/textures.js"></script>
+<script src='./js/textureTest.js'></script>
+<script src='./js/main.js' type='module'></script>
+<script src='./js/mapRunner.js' type='module'></script>
+<script src='./js/pieMaker.js' type='module'></script>
+<script src='./js/lineTester.js' type='module'></script>
+<script src='./js/pathTransitions.js'></script>
+
+</html>

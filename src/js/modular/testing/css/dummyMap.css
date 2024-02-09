@@ -1,0 +1,14 @@
+/*#map.legend {*/
+/*    stroke: green;*/
+/*}*/
+
+.legend-title{
+    font-weight: bold;
+}
+
+.canadaCircleText{
+    font-size:25px;
+}
+.canadaText {
+    font-size: 30px;
+}

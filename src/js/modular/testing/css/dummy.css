@@ -1,0 +1,93 @@
+/* Graph background */
+svg {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Legend and bar colours */
+/*svg#bar1 rect.val1, */
+/*svg#bar1 > g.bars > g.val1 > rect, */
+/*svg#bar1 > g.legend circle.val1 {*/
+/*  fill: #3455DB;*/
+/*}*/
+
+/*svg#bar1 > g.legend circle.val1{*/
+/*  stroke-width: 2px;*/
+/*  stroke: #3455DB;*/
+/*}*/
+
+/*svg#bar1 rect.val2, */
+/*svg#bar1 > g.bars > g.val2 > rect, */
+/*svg#bar1 > g.legend circle.val2 {*/
+/*  fill: #b11030;*/
+/*}*/
+
+/*svg#bar1 > g.legend circle.val2{*/
+/*  stroke-width: 2px;*/
+/*  stroke: #b11030;*/
+/*}*/
+
+/*svg#bar1 rect.val3, */
+/*svg#bar1 > g.bars > g.val3 > rect, */
+/*svg#bar1 > g.legend circle.val3 {*/
+/*  fill: green;*/
+/*}*/
+
+/*svg#bar1 > g.legend circle.val3{*/
+/*  stroke-width: 2px;*/
+/*  stroke: green;*/
+/*}*/
+
+/* Text sizing */
+svg#bar1 text.graph-title {
+  font-size: larger;
+}
+svg#bar1 g.axes text {
+  font-size: small;
+}
+
+svg#bar1 text.c-axis-title, svg#bar1 text.n-axis-title {
+  font-size: large;
+}
+/*svg#bar1 .axes .c text{*/
+/*  transform: rotate(30deg);*/
+/*  text-anchor: start;*/
+/*}*/
+
+svg#bar1 g.legend text {
+  font-size: small;
+  /*text-transform: capitalize;*/
+}
+svg#bar1 g.bars text{
+  font-size: small;
+}
+
+/*svg .n .tick:not(:nth-of-type(1)) line{*/
+/*  stroke: lightgray;*/
+/*}*/
+svg .n  line{
+  stroke: lightgray;
+}
+
+/* table */
+table th {
+  text-transform: capitalize;
+  scope: col;
+  vertical-align: top;
+}
+
+table caption {
+  text-align: left;
+}
+
+
+/* Tooltip styling */
+div.tooltip {
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  position: fixed;
+  max-width: 200px;
+}
