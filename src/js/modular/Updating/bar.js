@@ -2528,6 +2528,17 @@ export class BarGraph {
     this.#renderBars(tooltipEnter, tooltipLeave, tooltipMove);
 
     this.#renderLegend();
+    
+    if (this.#averageLines) {
+      this.#renderAverageLinesLegend();
+    }
+
+    if (this.#barHoverFade) {
+      this.#addBarHoverFade();
+    }
+    if (this.#legendHoverFade) {
+      this.#addLegendHoverFade();
+    }
 
     // update chart titles
     this.#renderTitles();
@@ -4371,21 +4382,33 @@ export class BarGraph {
         let targetClass = selection.attr('class').split(" ")[0]
         
         this.#selectedCategories = this.#findSelectedValues();
-        let selectorArray = [];
+        let rectSelectorArray = [];
+        let legendSelectorArray = [];
         this.#selectedCategories.map(el => {
-          if (el != targetClass)
-            selectorArray.push(`rect.${el}`);
+          if (el != targetClass){
+            rectSelectorArray.push(`rect.${el}`);
+            legendSelectorArray.push(`circle.${el},text.${el}`)
+          }
         })
         
-        if (selectorArray.length != 0){
-          let selector = selectorArray.join(",");
-          let rectGroups = this.#barGroup.selectAll(selector)
+        if (rectSelectorArray.length != 0){
+          let rectSelector = rectSelectorArray.join(",");
+          let legendSelector = legendSelectorArray.join(",");
+          
+          let rectGroups = this.#barGroup.selectAll(rectSelector)
+          let legendGroups = this.#legendGroup.selectAll(legendSelector);
           
           rectGroups
+            .attr('opacity', 0.3)
+          
+          legendGroups
             .attr('opacity', 0.3)
         }
 
         this.#barGroup.selectAll(`rect.${targetClass}`)
+          .attr('stroke', 'black')
+        
+        this.#legendGroup.selectAll(`circle.${targetClass}`)
           .attr('stroke', 'black')
     }
     
@@ -4395,15 +4418,24 @@ export class BarGraph {
         let targetClass = selection.attr('class').split(" ")[0];
         
         this.#selectedCategories = this.#findSelectedValues();
-        let selector = this.#selectedCategories.map(el => `rect.${el}`).join(",");
-        let rectGroups = this.#barGroup.selectAll(selector)
+        
+        let rectSelector = this.#selectedCategories.map(el => `rect.${el}`).join(",");
+        let legendSelector = this.#selectedCategories.map(el => `circle.${el},text.${el}`).join(",");
+        
+        let rectGroups = this.#barGroup.selectAll(rectSelector);
+        let legendGroups = this.#legendGroup.selectAll(legendSelector);
         
         // console.log(selector)
 
         rectGroups //:not(.${targetClass})
           .attr('opacity', 1)
+        legendGroups
+          .attr('opacity', 1)
 
         this.#barGroup.selectAll(`rect.${targetClass}`)
+          .attr('stroke', null)
+        
+        this.#legendGroup.selectAll(`circle.${targetClass}`)
           .attr('stroke', null)
     }
 
@@ -4420,8 +4452,6 @@ export class BarGraph {
       .on('focusout.fade', function(e,d){
         fadeIn(d3.select(e.target).select('circle'))
       })
-
-
   }
   #addInteraction() {
     const bars = this.#container
@@ -5145,10 +5175,14 @@ export class BarGraph {
           that.#callbackClick(d)
         }
       })
-      .on('mouseover', (e, d) => {
-        if (this.#callbackHover) {
-          this.#callbackHover(d)
+      .on('mouseover', function(e, d) {
+        if (that.#callbackHover) {
+          that.#callbackHover(d)
         }
+        d3.select(this).attr('stroke', 'black')
+      })
+      .on('mouseout', function(e, d) {
+        d3.select(this).attr('stroke', null)
       })
       .on('focus', (e, d) => {
         if (this.#callbackHover) {

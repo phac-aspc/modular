@@ -2467,58 +2467,71 @@ export class LineGraph {
     }
     #addHoverFadeout() {
         let that = this;
+        
+        //mouseover
+        let fadeOut = (selection) => {
+            let selectedLines = that.#findSelectedCategories(false);
+            
+            let targetCategory = selection.attr('data-category');
+            
+            let selectorArray = [];
+            // let legendSelectorArray = [];
+            selectedLines.map(el => {
+              if (el != targetCategory){
+                selectorArray.push(`g[data-category='${el}']`);
+                // legendSelectorArray.push(`circle.${el},text.${el}`)
+              }
+            })
+            
+            if (selectorArray.length != 0){
+                let groupSelector = selectorArray.join(",");
+                let lineGroups = this.#lineGroup.selectAll(groupSelector)
+                let legendGroups = this.#legendGroup.selectAll(groupSelector);
+                
+                lineGroups
+                    .attr('opacity', 0.3)
+                legendGroups
+                    .attr('opacity', 0.3)
+            }
+        }
+        
+        //mouseout
+        let fadeIn = (selection) => {
+            let selectedLines = that.#findSelectedCategories(false);
+            let targetCategory = selection.attr('data-category');
+            
+            let groupSelector = selectedLines.map(el => `g[data-category='${el}']`).join(",");
+            // let groupSelector = selectorArray.join(",");
+            
+            let lineGroups = this.#lineGroup.selectAll(groupSelector)
+            let legendGroups = this.#legendGroup.selectAll(groupSelector);
+            
+            lineGroups
+                .attr('opacity', 1)
+            legendGroups
+                .attr('opacity', 1)
+        }
 
         this.#lineGroup.selectAll('.line-group')
             .on('mouseover', function(d) {
-                let selectedLines = that.#findSelectedCategories(false);
-                // console.log(selectedLines)
-                let current = d3.select(this)
-                let otherGroups = that.#lineGroup.selectAll('.line-group').filter(function(el) {
-                    return d3.select(this).attr('data-category') != current.attr('data-category') && selectedLines.includes(d3.select(this).attr('data-category'))
-                })
-                otherGroups.attr('opacity', 0.3)
+                fadeOut(d3.select(this))
             })
             .on('focus', function(d) {
-                let selectedLines = that.#findSelectedCategories(false);
-                // console.log(selectedLines)
-                let current = d3.select(this)
-                let otherGroups = that.#lineGroup.selectAll('.line-group').filter(function(el) {
-                    return d3.select(this).attr('data-category') != current.attr('data-category') && selectedLines.includes(d3.select(this).attr('data-category'))
-                })
-                otherGroups.attr('opacity', 0.3)
+                fadeOut(d3.select(this))
             })
             .on('mouseout', function(d) {
-                let selectedLines = that.#findSelectedCategories(false);
-                let otherGroups = that.#lineGroup.selectAll('.line-group').filter(function(el) {
-                    return selectedLines.includes(d3.select(this).attr('data-category'))
-                })
-
-                otherGroups.attr('opacity', 1)
+                fadeIn(d3.select(this))
             })
             .on('focusout', function(d) {
-                let selectedLines = that.#findSelectedCategories(false);
-                let otherGroups = that.#lineGroup.selectAll('.line-group').filter(function(el) {
-                    return selectedLines.includes(d3.select(this).attr('data-category'))
-                })
-
-                otherGroups.attr('opacity', 1)
+                fadeIn(d3.select(this))
             })
 
         this.#legendGroup.selectAll('.legend-group')
             .on('mouseover', function(d) {
-                let selectedLines = that.#findSelectedCategories(false);
-                let current = d3.select(this)
-                let otherGroups = that.#lineGroup.selectAll('.line-group').filter(function(el) {
-                    return d3.select(this).attr('data-category') != current.attr('data-category') && selectedLines.includes(d3.select(this).attr('data-category'))
-                })
-                otherGroups.attr('opacity', 0.3)
+                fadeOut(d3.select(this))
             })
             .on('mouseout', function(d) {
-                let selectedLines = that.#findSelectedCategories(false);
-                let otherGroups = that.#lineGroup.selectAll('.line-group').filter(function(el) {
-                    return selectedLines.includes(d3.select(this).attr('data-category'))
-                })
-                otherGroups.attr('opacity', 1)
+                fadeIn(d3.select(this))
             })
     }
     #setTabbing() {

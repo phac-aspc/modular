@@ -1905,7 +1905,7 @@ export class Map {
         selection
             .on('mouseenter', (e, d) => {
                 let html;
-                // console.log(d, regionId, this.#data)
+                // console.log(e, d, regionId, this.#data)
                 
                 let myRegionId;
                 // if (typeof d === 'object') {
