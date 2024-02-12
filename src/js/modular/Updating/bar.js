@@ -2440,6 +2440,7 @@ export class BarGraph {
       nAxisOptions["tickFormat"] = d => d + '%';
     }
     if (this.#nTickFormat) {
+      //comment
       nAxisOptions["tickFormat"] = this.#nTickFormat;
     }
 
