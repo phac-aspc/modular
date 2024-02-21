@@ -107,6 +107,7 @@ export class BarGraph {
   #tableCellFunction;
   #tooltipFunction;
   #nTickFormat;
+  #labelFormat;
 
   //callbacks
   #callbackClick;
@@ -139,6 +140,8 @@ export class BarGraph {
   #table;
   #tableCaption;
   #tableSummary = d3.select('html').attr('lang') == "fr" ? "Texte descriptif" : "Text description";
+  
+  #isFrench = d3.select('html').attr('lang') == "fr" ? true : false;
 
 
   #axisGens;
@@ -1981,7 +1984,16 @@ export class BarGraph {
       return this.#nTickFormat;
     }
     else {
-      this.#nTickFormat = input
+      this.#nTickFormat = input;
+      return this;
+    }
+  }
+  labelFormat(input) {
+    if (arguments.length === 0) {
+      return this.#labelFormat;
+    }
+    else {
+      this.#labelFormat = input;
       return this;
     }
   }
@@ -2320,7 +2332,7 @@ export class BarGraph {
 
     // this.#container.call(t);
   }
-  initAxes(cAxisOptions = {}, nAxisOptions = {}) {
+  initAxes() {//cAxisOptions = {}, nAxisOptions = {}
     /*
     This function initialises the bottom and left scales for the bar graph
     
@@ -2339,6 +2351,24 @@ export class BarGraph {
     -----------------
     undefined
     */
+    
+    //axes options
+    let nAxisOptions = {};
+    let cAxisOptions = {};
+    if (this.#gridlines) {
+      const gridHeight = this.#height - this.#margins.b - this.#margins.t;
+      const gridWidth = this.#width - this.#margins.l - this.#margins.r;
+      const gridlineLength = this.#vertical ? -gridWidth : -gridHeight;
+
+      nAxisOptions["tickSizeInner"] = gridlineLength
+      nAxisOptions["tickPadding"] = 10
+    }
+    if (this.#proportional && !this.#grouped && !this.#nTickFormat) {
+      nAxisOptions["tickFormat"] = d => d + '%';
+    }
+    if (this.#nTickFormat) {
+      nAxisOptions["tickFormat"] = this.#nTickFormat;
+    }
 
     // Create axes
     let n = this.#vertical ? d3.axisLeft(this.#nScale) : d3.axisBottom(this.#nScale);
@@ -2426,25 +2456,7 @@ export class BarGraph {
       this.initTextures();
     }
 
-    let nAxisOptions = {};
-    let cAxisOptions = {};
-    if (this.#gridlines) {
-      const gridHeight = this.#height - this.#margins.b - this.#margins.t;
-      const gridWidth = this.#width - this.#margins.l - this.#margins.r;
-      const gridlineLength = this.#vertical ? -gridWidth : -gridHeight;
-
-      nAxisOptions["tickSizeInner"] = gridlineLength
-      nAxisOptions["tickPadding"] = 10
-    }
-    if (this.#proportional && !this.#grouped && !this.#nTickFormat) {
-      nAxisOptions["tickFormat"] = d => d + '%';
-    }
-    if (this.#nTickFormat) {
-      //comment
-      nAxisOptions["tickFormat"] = this.#nTickFormat;
-    }
-
-    this.initAxes(cAxisOptions, nAxisOptions);
+    this.initAxes();
     this.initBarWidth();
 
     return this;
@@ -2648,35 +2660,41 @@ export class BarGraph {
       return number;
     }
   }
-  #getLabel(d, isProportionalLabel = true) {
-    let value;
+  #getLabel(value, isProportionalLabel = true) {
+    let newValue;
     //stacked
-    if (!this.#grouped) {
-      if (d[1] - d[0] >= 0) {
-        value = this.#round(d[1] - d[0])
-        if (this.#decimalType = "fixed") {
-          value = value.toFixed(this.#decimalPlaces)
-        }
+    // if (!this.#grouped) {
+    //   if (d[1] - d[0] >= 0) {
+    //     if (this.#labelFormat){
+    //       return this.#labelFormat(d[1] - d[0])
+    //     }
+    //     value = this.#round(d[1] - d[0])
+    //     if (this.#decimalType = "fixed") {
+    //       value = value.toFixed(this.#decimalPlaces)
+    //     }
 
-        return value + (isProportionalLabel || this.#percent ? '%' : '');
-      }
-      // else {
-      //   console.log(this.#categoryKey)
-      //   return d.data[this.#nKey];
-      // }
-    }
+    //     return value + (isProportionalLabel || this.#percent ? '%' : '');
+    //   }
+    //   // else {
+    //   //   console.log(this.#categoryKey)
+    //   //   return d.data[this.#nKey];
+    //   // }
+    // }
     //grouped
-    else {
-      value = this.#round(d[this.#nKey])
+    // else {
+      if (this.#labelFormat){
+        return this.#labelFormat(value)
+      }
+      newValue = this.#round(value)
       if (this.#decimalType == "fixed") {
-        value = value.toFixed(this.#decimalPlaces)
+        newValue = newValue.toFixed(this.#decimalPlaces)
       }
       // console.log(value)
-      if (isNaN(value)) {
-        return d[this.#nKey];
+      if (isNaN(newValue)) {
+        return value;
       }
-      return value + (this.#percent ? '%' : '');
-    }
+      return newValue + ((isProportionalLabel || this.#percent) ? '%' : '');
+    // }
   }
   #calcGroupedXPos(d) {
     // console.log(d)
@@ -2735,9 +2753,41 @@ export class BarGraph {
     if (!this.#customGroup)
       this.#customGroup = this.#container.append('g').attr('class', 'custom')
   }
+  #barLabelTweenStacked(selection, d){
+    let that = this;
+    let oldVal = selection.text().replace('%', '');
+    
+    if (this.#isFrench){
+      oldVal = oldVal.replace(',', '.')
+    } else {
+      oldVal = +oldVal;
+    }
+    
+    // console.log(d)
+    // console.log(that.#getLabel(d[0], proportional))
+    let label = this.#getLabel(d[0][1] - d[0][0], this.#proportional);
+    let newVal = d[0][1] - d[0][0];
+    if (!isNaN(newVal)) {
+      // let newVal = +this.#getLabel(d[0][1] - d[0][0], this.#proportional).toString().replace('%', '');
+      // console.log(oldVal, newVal)
+      const i = d3.interpolate(+oldVal, newVal);
+      return function(t) {
+        // if (newVal % 1 == 0)
+        //   selection.text(Math.round(i(t)) + (that.#proportional ? '%' : ''));
+        // else
+        //   selection.text(that.#round(i(t)) + (that.#proportional ? '%' : ''));
+        selection.text(that.#getLabel(i(t), that.#proportional));
+      };
+    }
+    else {
+      selection.text(label)
+    }
+  }
+  #barLabelTweenGrouped(){
+    
+  }
   #renderBars(tooltipEnter, tooltipLeave, tooltipMove) {
-
-    if (!this.#barGroup)
+  if (!this.#barGroup)
       this.#barGroup = this.#container.append('g').attr('class', 'bars')
 
     let bars = this.#barGroup
@@ -2919,8 +2969,10 @@ export class BarGraph {
               .transition()
               .duration(this.#transitionDuration)
               .attr(y, d => {
-                // let value = nScale(d[0][last])
-                return nScale(d[0][last]);
+                let yVal = d[0][last];
+                const input = isNaN(yVal) ? 0 : yVal;
+                // console.log(yVal);
+                return nScale(input);
               })
               .attr(h, d => {
                 let height = nScale(d[0][first]) - nScale(d[0][last])
@@ -2944,7 +2996,7 @@ export class BarGraph {
             rect
               .attr('aria-label', d => {
                 // console.log(d)
-                return `${d.key}: ${this.#getLabel(d[0], proportional)}`
+                return `${d.key}: ${this.#getLabel(d[0][1] - d[0][0], proportional)}`
               })
               .attr('tabindex', -1)
 
@@ -2986,7 +3038,7 @@ export class BarGraph {
                 .on('mousemove', tooltipMove)
                 .text(d => {
                   if (typeof d[0][last] == 'number' && d[0][1] - d[0][0] >= 0) {
-                    return this.#getLabel(d[0], proportional);
+                    return this.#getLabel(d[0][1] - d[0][0], proportional);
                   }
                 });
               text
@@ -3007,13 +3059,13 @@ export class BarGraph {
                   }
                 })
                 .attr('opacity', function(d) {
-                  let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+                  let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
                   return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 1 : 0;
                 })
                 .on('end', function(d) {
                   let selection = d3.select(this);
                   selection.attr('display', function(d) {
-                    let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+                    let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
                     return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 'block' : 'none';
                   })
                 })
@@ -3099,7 +3151,7 @@ export class BarGraph {
             let updateRect = selection => {
               selection
                 .attr('aria-label', d => {
-                  return `${d.key}: ${this.#getLabel(d[0], proportional)}`
+                  return `${d.key}: ${this.#getLabel(d[0][1] - d[0][0], proportional)}`
                 })
                 .attr(w, function(d) {
                   let value = d3.select(this).attr(w)
@@ -3129,7 +3181,10 @@ export class BarGraph {
                 .transition()
                 .duration(this.#transitionDuration)
                 .attr(y, d => {
-                  return nScale(d[0][last]);
+                  let yVal = d[0][last];
+                  const input = isNaN(yVal) ? 0 : yVal;
+                  // console.log(yVal);
+                  return nScale(input);
                 })
                 .attr(h, d => {
                   let height = nScale(d[0][first]) - nScale(d[0][last])
@@ -3222,53 +3277,17 @@ export class BarGraph {
                     }
                   })
                   .attr('opacity', function(d) {
-                    let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+                    let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
                     return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 1 : 0;
                   })
                   .tween("text", function(d) {
                     let selection = d3.select(this);
-                    let oldVal = +selection.text().replace('%', '');
-                    // console.log(d)
-                    // console.log(that.#getLabel(d[0], proportional))
-                    let label = that.#getLabel(d[0], proportional);
-                    if (!isNaN(label)) {
-                      let newVal = +that.#getLabel(d[0], proportional).toString().replace('%', '');
-                      // console.log(newVal)
-                      const i = d3.interpolate(+oldVal, newVal);
-                      return function(t) {
-                        if (newVal % 1 == 0)
-                          selection.text(Math.round(i(t)) + (proportional ? '%' : ''));
-                        else
-                          selection.text(that.#round(i(t)) + (proportional ? '%' : ''));
-                      };
-                    }
-                    else {
-                      selection.text("")
-                    }
+                    return that.#barLabelTweenStacked(selection, d)
                   })
-                  // .tween("text", function(d) {
-                  //   let selection = d3.select(this);
-                  //   let oldVal = +selection.text().replace('%', '');
-                  //   let newVal = d[that.#nKey];
-                  //   if (!isNaN(oldVal) && !isNaN(newVal)) {
-                  //     const i = d3.interpolate(+oldVal, newVal);
-                  //     return function(t) {
-                  //       // selection.text(Math.round(i(t)));
-                  //       if (that.#decimalType == 'fixed')
-                  //         selection.text(d3.format(`.${that.#decimalPlaces}f`)(that.#round(i(t))) + (that.#percent ? '%' : ''))
-                  //       else
-                  //         selection.text(that.#round(i(t)) + (that.#percent ? '%' : ''));
-                  //     };
-                  //   }
-                  //   else {
-                  //     selection
-                  //       .text(that.#getLabel(d, proportional))
-                  //   }
-                  // })
                   .on('end', function(d) {
                     let selection = d3.select(this);
                     selection.attr('display', function(d) {
-                      let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+                      let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
                       return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 'block' : 'none';
                     })
                   })
@@ -3370,7 +3389,7 @@ export class BarGraph {
                   return `${d[this.#categoryKey]}: ${d[this.#nKey]}`
                 }
                 else {
-                  return `${this.#getLabel(d, proportional)}`
+                  return `${this.#getLabel(d[this.#nKey], proportional)}`
                 }
               })
               .attr('opacity', 1)
@@ -3482,14 +3501,12 @@ export class BarGraph {
                   }
                   else {
                     selection
-                      .text(that.#getLabel(d, proportional))
+                      .text(that.#getLabel(d[that.#nKey], proportional))
                   }
                 })
                 .on('end', function(d) {
                   let selection = d3.select(this);
                   selection.attr('display', function(d) {
-                    // let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
-                    // return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 'block' : 'none';
                     let dimensions = that.#calculateTextDimensions(d.val, that.#getFullFont(this))
                     return that.#labelFitsGroupedBar(dimensions.width, dimensions.height, d) ? 'block' : 'none';
                   })
@@ -3596,7 +3613,7 @@ export class BarGraph {
                     return `${d[this.#categoryKey]}: ${d[this.#nKey]}`
                   }
                   else {
-                    return `${this.#getLabel(d, proportional)}`
+                    return `${this.#getLabel(d[this.#nKey], proportional)}`
                   }
                 })
                 .attr(w, function(d) {
@@ -3756,14 +3773,12 @@ export class BarGraph {
                     }
                     else {
                       selection
-                        .text(that.#getLabel(d, proportional))
+                        .text(that.#getLabel(d[that.#nKey], proportional))
                     }
                   })
                   .on('end', function(d) {
                     let selection = d3.select(this);
                     selection.attr('display', function(d) {
-                      // let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
-                      // return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 'block' : 'none';
                       let dimensions = that.#calculateTextDimensions(d.val, that.#getFullFont(this))
                       return that.#labelFitsGroupedBar(dimensions.width, dimensions.height, d) ? 'block' : 'none';
                     })
@@ -4937,7 +4952,7 @@ export class BarGraph {
                   let identifiers = getRowIdentifiers(d);
                   d = getRowInData(proportionalStack, identifiers, d)
                 }
-                let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+                let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
                 return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 1 : 0;
               })
               .tween("text", function(d, i) {
@@ -4962,7 +4977,7 @@ export class BarGraph {
                     let identifiers = getRowIdentifiers(d);
                     d = getRowInData(proportionalStack, identifiers, d)
                   }
-                  let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+                  let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
                   return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 'block' : 'none';
                 })
               })
@@ -5076,7 +5091,7 @@ export class BarGraph {
                 let identifiers = getRowIdentifiers(d);
                 d = getRowInData(proportionalStack, identifiers, d)
               }
-              let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+              let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
               return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 1 : 0;
             })
             .tween("text", function(d, i) {
@@ -5101,7 +5116,7 @@ export class BarGraph {
                   let identifiers = getRowIdentifiers(d);
                   d = getRowInData(proportionalStack, identifiers, d)
                 }
-                let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0], proportional), that.#getFullFont(this))
+                let dimensions = that.#calculateTextDimensions(that.#getLabel(d[0][1] - d[0][0], proportional), that.#getFullFont(this))
                 return that.#labelFitsStackedBar(dimensions.width, dimensions.height, nScale, d[0]) ? 'block' : 'none';
               })
             })
@@ -5113,21 +5128,7 @@ export class BarGraph {
       //reinitialize all the nAxis variables to accomodate the removed bars, and update it
       this.initNScale(this.#log, false);
 
-      let nAxisOptions = {};
-      let cAxisOptions = {};
-      if (this.#gridlines) {
-        const gridHeight = this.#height - this.#margins.b - this.#margins.t;
-        const gridWidth = this.#width - this.#margins.l - this.#margins.r;
-        const gridlineLength = this.#vertical ? -gridWidth : -gridHeight;
-
-        nAxisOptions["tickSizeInner"] = gridlineLength
-        nAxisOptions["tickPadding"] = 10
-      }
-      if (this.#proportional && !this.#grouped) {
-        nAxisOptions["tickFormat"] = d => d + '%';
-      }
-
-      this.initAxes(cAxisOptions, nAxisOptions);
+      this.initAxes();
       this.#updateAxes();
 
       //update local reference to the nScale
@@ -5860,7 +5861,7 @@ export class BarGraph {
         let spanAttr = `style="border-left:5px solid ${colourScale(key)}; padding-left:3px"`
 
         // let value = d.data[key];
-        let value = this.#grouped ? this.#getLabel(d, proportional) : this.#getLabel(d[0], proportional);
+        let value = this.#grouped ? this.#getLabel(d[this.#nKey], proportional) : this.#getLabel(d[0][1] - d[0][0], proportional);
         // let value = d[this.#nKey]
         // if (!this.#grouped) {
         //   value = this.#round(parseFloat(d[0][1] - d[0][0])) + (this.#proportional ? '%' : '');

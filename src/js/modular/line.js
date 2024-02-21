@@ -66,6 +66,8 @@ export class LineGraph {
     #width = 720;
     #height = 480;
     #margins = { l: 100, r: 60, t: 60, b: 100 };
+    
+    #lineWidth = 4;
 
     #min;
     #max;
@@ -107,6 +109,7 @@ export class LineGraph {
     //formatters
     #tableHeaderFunction;
     #nTickFormat;
+    #cTickFormat;
 
     //#region =============== CHAINING METHODS (get/set) ================= //
     data(inputData) {
@@ -568,6 +571,29 @@ export class LineGraph {
             }
             else {
                 console.error('height must be a non-negative number');
+            }
+        }
+    }
+    lineWidth(inputWidth) {
+        /*
+        Parameters 
+        ----------------
+        inputWidth (type: number)
+          - A non-negative number for the width of the bar graph.
+        */
+        if (arguments.length === 0) {
+            return this.#lineWidth;
+        }
+        else {
+            const validNum = (typeof inputWidth == typeof 5) &&
+                (inputWidth >= 0);
+
+            if (validNum) {
+                this.#lineWidth = inputWidth;
+                return this;
+            }
+            else {
+                console.error('lineWidth must be a non-negative number');
             }
         }
     }
@@ -1257,6 +1283,15 @@ export class LineGraph {
             return this;
         }
     }
+    cTickFormat(input) {
+        if (arguments.length === 0) {
+            return this.#cTickFormat;
+        }
+        else {
+            this.#cTickFormat = input
+            return this;
+        }
+    }
     //#endregion
 
     //#region ============== PUBLIC (setup) ============== //
@@ -1414,7 +1449,7 @@ export class LineGraph {
             .domain(this.#categories)
             .range(this.#colourSeries)
     }
-    initAxes(cAxisOptions = {}, nAxisOptions = {}, sAxisOptions = {}) {
+    initAxes() {
         /*
         This function initialises the bottom and left scales for the bar graph
         
@@ -1433,6 +1468,28 @@ export class LineGraph {
         -----------------
         undefined
         */
+        
+        
+        let nAxisOptions = {};
+        let cAxisOptions = {};
+        let sAxisOptions = {};
+        if (this.#gridlines) {
+            const gridHeight = this.#height - this.#margins.b - this.#margins.t;
+            const gridWidth = this.#width - this.#margins.l - this.#margins.r;
+            const gridlineLength = -gridWidth
+
+            nAxisOptions["tickSizeInner"] = gridlineLength
+            nAxisOptions["tickPadding"] = 10
+        }
+        if (this.#cAxisTickSkip > 0) {
+            cAxisOptions['tickValues'] = this.#cScale.domain().filter((d, i) => i % this.#cAxisTickSkip === 0)
+        }
+        if (this.#nTickFormat) {
+            nAxisOptions["tickFormat"] = this.#nTickFormat;
+        }
+        if (this.#cTickFormat) {
+            cAxisOptions["tickFormat"] = this.#cTickFormat;
+        }
 
         // Create axes
         let n = d3.axisLeft(this.#nScale);
@@ -1477,25 +1534,9 @@ export class LineGraph {
         }
         this.initColourScale();
 
-        let nAxisOptions = {};
-        let cAxisOptions = {};
-        let sAxisOptions = {};
-        if (this.#gridlines) {
-            const gridHeight = this.#height - this.#margins.b - this.#margins.t;
-            const gridWidth = this.#width - this.#margins.l - this.#margins.r;
-            const gridlineLength = -gridWidth
+        
 
-            nAxisOptions["tickSizeInner"] = gridlineLength
-            nAxisOptions["tickPadding"] = 10
-        }
-        if (this.#cAxisTickSkip > 0) {
-            cAxisOptions['tickValues'] = this.#cScale.domain().filter((d, i) => i % this.#cAxisTickSkip === 0)
-        }
-        if (this.#nTickFormat) {
-            nAxisOptions["tickFormat"] = this.#nTickFormat;
-        }
-
-        this.initAxes(cAxisOptions, nAxisOptions, sAxisOptions);
+        this.initAxes();
         return this;
     }
     render() {
@@ -1772,7 +1813,7 @@ export class LineGraph {
                             .attr('opacity', 1)
                             .attr("fill", "none")
                             .attr("stroke", (d, i) => this.#colourScale(this.#categories[i]))
-                            .attr("stroke-width", 4)
+                            .attr("stroke-width", this.#lineWidth)
                             .style("stroke-dasharray", (d, i) => {
                                 // console.log(d)
                                 if (!this.#lineTypeSeries) {
@@ -2166,7 +2207,7 @@ export class LineGraph {
                     if (!this.#hideLines) {
                         g.append('line')
                             .attr("stroke", (d, i) => this.#colourScale(d))
-                            .attr("stroke-width", 4)
+                            .attr("stroke-width", this.#lineWidth)
                             .attr("x1", 0)
                             .attr("y1", 0)
                             .attr("x2", lineLength)
@@ -2384,22 +2425,7 @@ export class LineGraph {
             //reinitialize all the nAxis variables to accomodate the removed bars, and update it
             this.initNScale(false);
 
-            let nAxisOptions = {};
-            let cAxisOptions = {};
-            let sAxisOptions = {};
-            if (this.#gridlines) {
-                const gridHeight = this.#height - this.#margins.b - this.#margins.t;
-                const gridWidth = this.#width - this.#margins.l - this.#margins.r;
-                const gridlineLength = -gridWidth
-
-                nAxisOptions["tickSizeInner"] = gridlineLength
-                nAxisOptions["tickPadding"] = 10
-            }
-            if (this.#cAxisTickSkip > 0) {
-                cAxisOptions['tickValues'] = this.#cScale.domain().filter((d, i) => i % this.#cAxisTickSkip === 0)
-            }
-
-            this.initAxes(cAxisOptions, nAxisOptions, sAxisOptions);
+            this.initAxes();
             this.#updateAxes();
 
             // //update local reference to the nScale

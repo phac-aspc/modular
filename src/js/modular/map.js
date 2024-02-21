@@ -139,7 +139,7 @@ export class Map {
         "35": "ON"
     };
 
-    //Chain methods
+    //region Chain methods
     wrapper(input) {
         if (arguments.length === 0) {
             return this.#wrapper;
@@ -1191,8 +1191,9 @@ export class Map {
             }
         }
     }
+    //endregion
 
-    //PUBLIC
+    //region PUBLIC
     init() {
         this.#initProjection();
         this.#initPath();
@@ -1278,9 +1279,9 @@ export class Map {
                     const i = d3.interpolate(oldVal, newVal);
                     return function(t) {
                         if (newVal % 1 == 0)
-                            selection.text(that.#formatNumber(Math.round(i(t))));
+                            selection.text(that.#formatNumber(Math.round(i(t)), d));
                         else
-                            selection.text(that.#formatNumber(that.#round(i(t))));
+                            selection.text(that.#formatNumber(that.#round(i(t)), d));
                     };
                 }
                 else {
@@ -1347,14 +1348,15 @@ export class Map {
         //#endregion
         return this;
     }
+    //endregion
 
-    //PRIVATE
+    //region PRIVATE
     #parseNumber(value) {
 
     }
-    #formatNumber(num) {
+    #formatNumber(num, d) {
         if (this.#numberFormat) {
-            return this.#numberFormat(num)
+            return this.#numberFormat(num, d)
         }
         return this.#defaultNumberFormat(this.#round(num)).replaceAll(',', this.#numberSeperator) + (this.#percent ? '%' : '')
     }
@@ -1370,8 +1372,7 @@ export class Map {
             return this.#notApplicableLabel;
         }
         else {
-            return this.#formatNumber(data[d.properties[this.#regionId]])
-            // return this.#numberFormat(this.#round(data[d.properties[this.#regionId]])).replaceAll(',', this.#numberSeperator) + (this.#percent ? '%' : '')
+            return this.#formatNumber(data[d.properties[this.#regionId]], d)
         }
     }
     #initProjection() {
@@ -1954,7 +1955,7 @@ export class Map {
         const borderColour = this.#borderColour;
         const regionId = this.#regionId;
         const regionName = this.#regionName;
-        console.log('InvisMapData', mapData)
+        // console.log('InvisMapData', mapData)
 
         var invisPaths = invisGroup
             .selectAll(".region")
@@ -2192,7 +2193,7 @@ export class Map {
         }
         let canadaTextFont = parseFloat(window.getComputedStyle(element.node(), null)["fontSize"])
         let padding = this.#SINotation ? 5 : 0
-        let newRadius = this.#calculateRadius(value.length, canadaTextFont) + padding
+        let newRadius = this.#calculateRadius(value.toString().length, canadaTextFont) + padding
         return newRadius < this.#minRadius ? this.#minRadius : newRadius;
     }
     #renderCanadaBubble() {
@@ -2209,6 +2210,7 @@ export class Map {
         else {
             textVal = this.#formatNumber(canadaValue)
         }
+        console.log('canadaTextVal', textVal)
 
         // let canadaBackground = canadaGroupContainer.append('rect')
         //canadaCircle renders first to get the proper overlap. attributes come later so that we can modify the radius to accomodate the fully rendered text in the circle
@@ -2528,4 +2530,5 @@ export class Map {
         let height = metrics.fontBoundingBoxAscent;
         return { width, height };
     }
+    //endregion
 }

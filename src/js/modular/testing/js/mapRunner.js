@@ -108,8 +108,14 @@ function buildMap1(mapData, data, barData, markerData){
     }
 
     
-    
-    
+    let numberFormat = (num, d) => {
+        // console.log("numberFormatMap", num, d)
+        let myNum = d3.format(',.1f')(num); //some number format - optional but recommend , modify as you want
+        myNum = myNum + "%"; // add percentages back, you're overwritting the formatting options
+        if (d != null && d.properties.PRUID == '35') // null check incase there's no data (canada bubble), otherwise whatever region id you're looking to add extra stuff to
+            myNum = myNum+"*";
+        return myNum;
+    }
 
     const map = new Map();
     // console.log(mapData)
@@ -125,7 +131,7 @@ function buildMap1(mapData, data, barData, markerData){
         .displayValues(true)
         .tooltips(true)
         .notApplicable(true)
-        // .percent(true)
+        .percent(true)
         .suppressed(true)
         .canadaBubble(true)
         .decimalPlaces(1)
@@ -133,6 +139,7 @@ function buildMap1(mapData, data, barData, markerData){
         // .SINotation(true)
         
         .numberSeperator(" ")
+        .numberFormat(numberFormat)
         
         .callbackClick(passedFunction)
         .callbackHover(callbackHover)
